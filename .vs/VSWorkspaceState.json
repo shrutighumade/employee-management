@@ -1,0 +1,12 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Backend",
+    "\\Backend\\EmployeeManagement.API",
+    "\\Backend\\EmployeeManagement.API\\Controllers",
+    "\\Backend\\EmployeeManagement.API\\Helpers",
+    "\\Backend\\EmployeeManagement.API\\Services"
+  ],
+  "SelectedNode": "\\Backend\\EmployeeManagement.API\\Controllers\\AuthController.cs",
+  "PreviewInSolutionExplorer": false
+}
