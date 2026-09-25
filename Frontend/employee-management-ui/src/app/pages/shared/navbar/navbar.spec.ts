@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 import { provideRouter } from '@angular/router';
-import { App } from './app';
+import { Navbar } from './navbar';
 
 beforeAll(() => {
   try {
@@ -15,33 +15,31 @@ beforeAll(() => {
   }
 });
 
-describe('App Component', () => {
-  let component: App;
-  let fixture: ComponentFixture<App>;
+describe('Navbar Component', () => {
+  let component: Navbar;
+  let fixture: ComponentFixture<Navbar>;
 
   beforeEach(async () => {
     TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
-      imports: [App],
+      imports: [Navbar],
       providers: [provideRouter([])]
     }).compileComponents();
 
-    fixture = TestBed.createComponent(App);
+    fixture = TestBed.createComponent(Navbar);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
 
-  it('should create the main app component', () => {
+  it('should create the navbar component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should have title signal initialized', () => {
-    expect((component as any).title()).toBe('employee-management-ui');
-  });
-
-  it('should render router outlet and navbar', () => {
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-navbar')).toBeTruthy();
-    expect(compiled.querySelector('router-outlet')).toBeTruthy();
+  it('should toggle mobile menu signal state', () => {
+    expect((component as any).isMobileMenuOpen()).toBeFalse();
+    (component as any).toggleMobileMenu();
+    expect((component as any).isMobileMenuOpen()).toBeTrue();
+    (component as any).toggleMobileMenu();
+    expect((component as any).isMobileMenuOpen()).toBeFalse();
   });
 });
