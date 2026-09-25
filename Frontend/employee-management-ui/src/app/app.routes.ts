@@ -3,25 +3,20 @@ import { Register } from './pages/register/register';
 import { Login } from './pages/login/login';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { ResetPassword } from './pages/reset-password/reset-password';
-
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Employee } from './pages/employee/employee';
 import { PageNotFound } from './pages/page-not-found/page-not-found';
 
-
 export const routes: Routes = [
-
   {
     path: '',
-    redirectTo: 'register',
+    redirectTo: 'dashboard',
     pathMatch: 'full'
   },
-
   {
     path: 'register',
     component: Register
   },
-
   {
     path: 'login',
     component: Login
@@ -29,10 +24,6 @@ export const routes: Routes = [
   {
     path: 'forgot-password',
     component: ForgotPassword
-  },
-  {
-    path: 'reset-password',
-    component: ResetPassword
   },
   {
     path: 'reset-password',
@@ -47,8 +38,7 @@ export const routes: Routes = [
     component: Employee
   },
   {
-    path: "**",
+    path: '**',
     component: PageNotFound
   }
-
 ];
