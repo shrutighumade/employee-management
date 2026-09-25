@@ -1,21 +1,82 @@
-<nav>
-  <div class="navbar-wrapper">
-    <div class="navbar-title">
-      Employee Management
-    </div>
-    <ul>
-      <li>
-        <a routerLink="/dashboard">
-          Dashboard
-        </a>
-      </li>
-      <li>
-        <a routerLink="/users">User</a>
-      </li>
-      <li><a routerLink="/employee">Employee</a></li>
-    </ul>
-    <div class="navbar-profile">
-      Logout
+<nav class="app-navbar" aria-label="Main Navigation">
+  <div class="navbar-container">
+    <!-- Brand Logo -->
+    <a routerLink="/dashboard" class="navbar-brand">
+      <div class="brand-logo-badge">
+        <i class="fa-solid fa-users-gear"></i>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Employee Portal</span>
+        <span class="brand-sub">Management System</span>
+      </div>
+    </a>
+
+    <!-- Mobile Menu Toggle Button -->
+    <button
+      type="button"
+      class="mobile-toggle-btn"
+      (click)="toggleMobileMenu()"
+      aria-label="Toggle navigation menu"
+      [attr.aria-expanded]="isMobileMenuOpen()"
+    >
+      <i class="fa-solid" [class.fa-bars]="!isMobileMenuOpen()" [class.fa-xmark]="isMobileMenuOpen()"></i>
+    </button>
+
+    <!-- Nav Links & Actions -->
+    <div class="nav-menu" [class.open]="isMobileMenuOpen()">
+      <ul class="nav-links">
+        <li>
+          <a
+            routerLink="/dashboard"
+            routerLinkActive="active"
+            class="nav-link-item"
+            (click)="isMobileMenuOpen.set(false)"
+          >
+            <i class="fa-solid fa-chart-pie nav-icon"></i>
+            <span>Dashboard</span>
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="/employee"
+            routerLinkActive="active"
+            class="nav-link-item"
+            (click)="isMobileMenuOpen.set(false)"
+          >
+            <i class="fa-solid fa-users nav-icon"></i>
+            <span>Employees</span>
+          </a>
+        </li>
+        <li>
+          <a
+            routerLink="/users"
+            routerLinkActive="active"
+            class="nav-link-item"
+            (click)="isMobileMenuOpen.set(false)"
+          >
+            <i class="fa-solid fa-user-gear nav-icon"></i>
+            <span>Users</span>
+          </a>
+        </li>
+      </ul>
+
+      <!-- User Profile & Logout -->
+      <div class="navbar-right-actions">
+        <div class="user-profile-badge">
+          <div class="user-avatar-sm">
+            <i class="fa-solid fa-user"></i>
+          </div>
+          <div class="user-meta">
+            <span class="user-name">Admin User</span>
+            <span class="user-role">Administrator</span>
+          </div>
+        </div>
+
+        <button type="button" class="btn-logout" (click)="logout()" title="Logout of system" aria-label="Logout">
+          <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          <span class="logout-text">Logout</span>
+        </button>
+      </div>
     </div>
   </div>
 </nav>
