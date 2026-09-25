@@ -5,6 +5,8 @@ import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { ResetPassword } from './pages/reset-password/reset-password';
 
 import { Dashboard } from './pages/dashboard/dashboard';
+import { Employee } from './pages/employee/employee';
+import { PageNotFound } from './pages/page-not-found/page-not-found';
 
 
 export const routes: Routes = [
@@ -39,6 +41,14 @@ export const routes: Routes = [
   {
     path: 'dashboard',
     component: Dashboard
+  },
+  {
+    path: 'employee',
+    component: Employee
+  },
+  {
+    path: "**",
+    component: PageNotFound
   }
 
 ];

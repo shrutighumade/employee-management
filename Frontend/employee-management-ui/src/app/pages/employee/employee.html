@@ -1,0 +1,123 @@
+<div class="container-fluid vh-100 bg-light py-3 overflow-hidden d-flex flex-column">
+  <div class="row h-100 g-4">
+
+    <!-- LEFT : TABLE -->
+    <div class="col-lg-8 h-100 d-flex flex-column">
+
+      <!-- Table Header -->
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="m-0 fw-bold text-dark">Employees</h4>
+        <span class="badge bg-secondary rounded-pill px-3 py-2">{{ employees().length }} employees</span>
+      </div>
+
+      <!-- Table Card (Scrollable) -->
+      <div class="card shadow-sm border-0 flex-grow-1 overflow-auto">
+        <div class="card-body p-0">
+          <table class="table table-hover align-middle mb-0 text-nowrap">
+            <thead class="table-light sticky-top">
+              <tr>
+                <th scope="col" class="ps-4 border-0 py-3">#</th>
+                <th scope="col" class="border-0 py-3">Name</th>
+                <th scope="col" class="border-0 py-3">ID</th>
+                <th scope="col" class="border-0 py-3">Salary</th>
+                <th scope="col" class="border-0 py-3">Leaves</th>
+                <th scope="col" class="border-0 py-3">Joining Date</th>
+                <th scope="col" class="border-0 py-3">Phone</th>
+                <th scope="col" class="text-end pe-4 border-0 py-3">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (employee of employees(); track employee.employeId; let i = $index) {
+              <tr>
+                <td class="ps-4 text-muted">{{ i + 1 }}</td>
+                <td class="fw-bold text-dark">{{ employee.name }}</td>
+                <td>{{ employee.employeId }}</td>
+                <td>₹{{ employee.employeSalary }}</td>
+                <td>
+                  <span class="badge bg-light text-dark border px-2 py-1">{{ employee.leavesCount }}</span>
+                </td>
+                <td>{{ employee.joingDate }}</td>
+                <td>{{ employee.phoneNumber }}</td>
+                <td class="text-end pe-4">
+                  <button type="button" class="btn btn-sm btn-outline-primary me-2 px-3" (click)="editEmployee(i)">Edit</button>
+                  <button type="button" class="btn btn-sm btn-outline-danger px-3" (click)="deleteEmployee(i)">Delete</button>
+                </td>
+              </tr>
+              }
+
+              @if (employees().length === 0) {
+              <tr>
+                <td colspan="8" class="text-center py-5 text-muted">No employees found.</td>
+              </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- RIGHT : FORM -->
+    <div class="col-lg-4 h-100 d-flex flex-column">
+
+      <!-- Form Header -->
+      <div class="mb-3">
+        <h4 class="m-0 fw-bold text-dark">
+          @if (editingIndex() === null) { Add Employee } @else { Edit Employee }
+        </h4>
+      </div>
+
+      <!-- Form Card (Scrollable) -->
+      <div class="card shadow-sm border-0 flex-grow-1 overflow-auto">
+        <div class="card-body p-4">
+          <form [formGroup]="employeeForm" (ngSubmit)="saveEmployee()">
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary mb-1">Name</label>
+              <input type="text" class="form-control form-control-sm p-2" formControlName="name" placeholder="Employee name">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary mb-1">Employee ID</label>
+              <input type="number" class="form-control form-control-sm p-2" formControlName="employeId" placeholder="0">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary mb-1">Salary</label>
+              <input type="number" class="form-control form-control-sm p-2" formControlName="employeSalary" placeholder="0">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary mb-1">Leaves</label>
+              <input type="number" class="form-control form-control-sm p-2" formControlName="leavesCount" placeholder="0">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary mb-1">Joining Date</label>
+              <input type="date" class="form-control form-control-sm p-2" formControlName="joingDate">
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold text-secondary mb-1">Date of Birth</label>
+              <input type="date" class="form-control form-control-sm p-2" formControlName="dateOfBirth">
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label small fw-bold text-secondary mb-1">Phone Number</label>
+              <input type="tel" class="form-control form-control-sm p-2" formControlName="phoneNumber" placeholder="Phone number">
+            </div>
+
+            <div class="d-flex gap-2">
+              <button type="submit" class="btn btn-primary flex-grow-1 py-2 fw-semibold">
+                @if (editingIndex() === null) { Add Employee } @else { Update Employee }
+              </button>
+              <button type="button" class="btn btn-outline-secondary px-4 py-2 fw-semibold" (click)="resetForm()">Clear</button>
+            </div>
+
+          </form>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

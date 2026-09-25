@@ -1,0 +1,36 @@
+nav {
+  background-color: #e1e1e1;
+  padding:15px 0;
+}
+
+.navbar-wrapper{
+    display:flex;
+    justify-content:space-between;
+    margin:0 50px;
+    align-items:center;
+}
+
+ul{
+    display:flex;
+    justify-content:flex-end;
+    gap:30px;
+}
+li {
+  list-style: none;
+  font-size: medium;
+  font-weight: 600;
+}
+a{
+    text-decoration:none;
+    cursor:pointer;
+}
+
+.navbar-title {
+    font-size:large;
+    font-weight:700;
+}
+
+.navbar-profile {
+  font-size: large;
+  font-weight: 700;
+}
