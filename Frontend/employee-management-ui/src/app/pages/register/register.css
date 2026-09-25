@@ -1,0 +1,47 @@
+.register-container {
+  width: 400px;
+  margin: 50px auto;
+  padding: 30px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+  .register-container h2 {
+    text-align: center;
+    margin-bottom: 25px;
+  }
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+  .form-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 10px;
+    box-sizing: border-box;
+  }
+
+button {
+  width: 100%;
+  padding: 10px;
+  cursor: pointer;
+}
+
+p {
+  text-align: center;
+  margin-top: 20px;
+}
+.error {
+  display: block;
+  margin-top: 5px;
+  color: red;
+}
+
+button:disabled {
+  cursor: not-allowed;
+}
