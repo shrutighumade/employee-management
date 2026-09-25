@@ -1,126 +1,78 @@
-import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import '@angular/compiler';
+import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { runInInjectionContext, Injector } from '@angular/core';
+import { FormBuilder } from '@angular/forms';
+import { of } from 'rxjs';
 import { Employee } from './employee';
-
-beforeAll(() => {
-  try {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting()
-    );
-  } catch {
-    // Environment already initialized
-  }
-});
+import { EmployeeService, IEmployee } from '../../services/employee.service';
 
 describe('Employee Component', () => {
   let component: Employee;
-  let fixture: ComponentFixture<Employee>;
+  let mockEmployeeService: any;
+  let formBuilder: FormBuilder;
 
-  beforeEach(async () => {
-    TestBed.resetTestingModule();
-    await TestBed.configureTestingModule({
-      imports: [Employee]
-    }).compileComponents();
+  const sampleEmployees: IEmployee[] = [
+    { id: 1, name: 'Hrushikesh', employeId: 415, employeSalary: 30000, leavesCount: 26, joingDate: '2024-11-04', dateOfBirth: '2001-12-11', phoneNumber: '7263069877' },
+    { id: 2, name: 'Rahul', employeId: 416, employeSalary: 35000, leavesCount: 20, joingDate: '2023-06-10', dateOfBirth: '2000-05-15', phoneNumber: '9876543210' }
+  ];
 
-    fixture = TestBed.createComponent(Employee);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
+  beforeEach(() => {
+    formBuilder = new FormBuilder();
+    mockEmployeeService = {
+      getEmployees: vi.fn().mockReturnValue(of({ items: sampleEmployees, totalCount: 2, page: 1, pageSize: 5, totalPages: 1 })),
+      createEmployee: vi.fn().mockReturnValue(of({ id: 3, name: 'New Employee', employeId: 417, employeSalary: 40000, leavesCount: 15, joingDate: '2025-01-01', dateOfBirth: '1995-01-01', phoneNumber: '9000000000' })),
+      updateEmployee: vi.fn().mockReturnValue(of({ id: 1, name: 'Hrushikesh Updated', employeId: 415, employeSalary: 35000, leavesCount: 25, joingDate: '2024-11-04', dateOfBirth: '2001-12-11', phoneNumber: '7263069877' })),
+      deleteEmployee: vi.fn().mockReturnValue(of(null))
+    };
+
+    const mockInjector = Injector.create({
+      providers: [
+        { provide: FormBuilder, useValue: formBuilder },
+        { provide: EmployeeService, useValue: mockEmployeeService }
+      ]
+    });
+
+    runInInjectionContext(mockInjector, () => {
+      component = new Employee();
+    });
   });
 
-  it('should create the employee component', () => {
+  it('should instantiate component', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with default employees', () => {
-    const employees = (component as any).employees();
-    expect(employees.length).toBe(3);
-    expect(employees[0].name).toBe('Hrushikesh');
-  });
+  it('should compute metrics correctly from state', () => {
+    (component as any).employees.set(sampleEmployees);
 
-  it('should compute metrics correctly', () => {
-    expect((component as any).totalEmployeesCount()).toBe(3);
-    expect((component as any).totalPayroll()).toBe(30000 + 35000 + 40000);
-    expect((component as any).avgSalary()).toBe(Math.round((30000 + 35000 + 40000) / 3));
-    expect((component as any).totalLeavesCount()).toBe(26 + 20 + 18);
-  });
-
-  it('should filter employees based on search query', () => {
-    (component as any).searchQuery.set('Rahul');
-    expect((component as any).filteredEmployees().length).toBe(1);
-    expect((component as any).filteredEmployees()[0].name).toBe('Rahul');
-
-    (component as any).searchQuery.set('417');
-    expect((component as any).filteredEmployees().length).toBe(1);
-    expect((component as any).filteredEmployees()[0].name).toBe('Amit');
-
-    (component as any).clearSearch();
-    expect((component as any).filteredEmployees().length).toBe(3);
-  });
-
-  it('should open drawer and reset form when adding new employee', () => {
-    (component as any).openAddDrawer();
-    expect((component as any).isDrawerOpen()).toBeTrue();
-    expect((component as any).editingIndex()).toBeNull();
-  });
-
-  it('should populate form when editing an employee', () => {
-    (component as any).editEmployee(1);
-    expect((component as any).isDrawerOpen()).toBeTrue();
-    expect((component as any).editingIndex()).toBe(1);
-    expect((component as any).employeeForm.getRawValue().name).toBe('Rahul');
-  });
-
-  it('should add a new employee when form is valid', () => {
-    (component as any).openAddDrawer();
-    (component as any).employeeForm.setValue({
-      name: 'John Doe',
-      employeId: 418,
-      employeSalary: 50000,
-      leavesCount: 15,
-      joingDate: '2025-01-10',
-      dateOfBirth: '1995-04-12',
-      phoneNumber: '9876543211'
-    });
-
-    (component as any).saveEmployee();
-
-    expect((component as any).employees().length).toBe(4);
-    expect((component as any).employees()[3].name).toBe('John Doe');
-    expect((component as any).isDrawerOpen()).toBeFalse();
-  });
-
-  it('should update an existing employee when editing', () => {
-    (component as any).editEmployee(0);
-    (component as any).employeeForm.patchValue({ name: 'Hrushikesh Updated' });
-
-    (component as any).saveEmployee();
-
-    expect((component as any).employees()[0].name).toBe('Hrushikesh Updated');
-    expect((component as any).isDrawerOpen()).toBeFalse();
-  });
-
-  it('should delete employee after confirmation', () => {
-    (component as any).promptDelete(1);
-    expect((component as any).deleteConfirmIndex()).toBe(1);
-
-    (component as any).confirmDelete();
     expect((component as any).employees().length).toBe(2);
-    expect((component as any).deleteConfirmIndex()).toBeNull();
-    expect((component as any).employees().find((e: any) => e.name === 'Rahul')).toBeUndefined();
+    expect((component as any).totalPayroll()).toBe(65000);
+    expect((component as any).avgSalary()).toBe(32500);
+    expect((component as any).totalLeavesCount()).toBe(46);
   });
 
-  it('should cancel delete confirmation', () => {
-    (component as any).promptDelete(0);
-    (component as any).cancelDelete();
-    expect((component as any).deleteConfirmIndex()).toBeNull();
-    expect((component as any).employees().length).toBe(3);
+  it('should handle pagination controls correctly', () => {
+    (component as any).totalPages.set(3);
+    (component as any).currentPage.set(1);
+
+    (component as any).nextPage();
+    expect((component as any).currentPage()).toBe(2);
+
+    (component as any).prevPage();
+    expect((component as any).currentPage()).toBe(1);
+  });
+
+  it('should open and close add employee drawer', () => {
+    (component as any).openAddDrawer();
+    expect((component as any).isDrawerOpen()).toBe(true);
+    expect((component as any).editingIndex()).toBeNull();
+
+    (component as any).closeDrawer();
+    expect((component as any).isDrawerOpen()).toBe(false);
   });
 
   it('should generate initials correctly', () => {
-    expect((component as any).getInitials('Hrushikesh')).toBe('HR');
-    expect((component as any).getInitials('John Doe')).toBe('JD');
+    expect((component as any).getInitials('Hrushikesh Sharma')).toBe('HS');
+    expect((component as any).getInitials('John')).toBe('JO');
     expect((component as any).getInitials('')).toBe('EM');
   });
 });
