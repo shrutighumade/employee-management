@@ -1,71 +1,122 @@
-<div class="login-container">
+<div class="auth-page">
 
-  <h2>Login</h2>
+  <div class="login-container">
 
-  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <!-- Login Card -->
+    <div class="card auth-card">
 
-    <!-- Email -->
-    <div class="form-group">
+      <div class="card-body">
 
-      <label for="email">Email</label>
+        <!-- Header -->
+        <div class="login-header">
+          <h2 class="auth-title">Welcome Back</h2>
 
-      <input id="email"
-             type="email"
-             formControlName="email"
-             placeholder="Enter your email" />
+          <p class="auth-subtitle">
+            Sign in to your account
+          </p>
+        </div>
 
-      @if (loginForm.controls.email.touched &&
-      loginForm.controls.email.invalid) {
 
-      <small class="error">
-        Please enter a valid email.
-      </small>
+        <!-- Login Form -->
+        <form [formGroup]="loginForm"
+              (ngSubmit)="onSubmit()">
 
-      }
+          <!-- Email -->
+          <div class="form-field">
+
+            <label for="email"
+                   class="form-label custom-label">
+              Email Address
+            </label>
+
+            <input id="email"
+                   type="email"
+                   class="form-control custom-input"
+                   formControlName="email"
+                   placeholder="Enter your email" />
+
+            @if (
+            loginForm.controls.email.touched &&
+            loginForm.controls.email.invalid
+            ) {
+            <div class="invalid-message">
+              Please enter a valid email address.
+            </div>
+            }
+
+          </div>
+
+
+          <!-- Password -->
+          <div class="form-field">
+
+            <label for="password"
+                   class="form-label custom-label">
+              Password
+            </label>
+
+            <input id="password"
+                   type="password"
+                   class="form-control custom-input"
+                   formControlName="password"
+                   placeholder="Enter your password" />
+
+            @if (
+            loginForm.controls.password.touched &&
+            loginForm.controls.password.invalid
+            ) {
+            <div class="invalid-message">
+              Password is required.
+            </div>
+            }
+
+          </div>
+
+
+          <!-- Forgot Password -->
+          <div class="forgot-container">
+
+            <a routerLink="/forgot-password"
+               class="forgot-link">
+              Forgot Password?
+            </a>
+
+          </div>
+
+
+          <!-- Login Button -->
+          <button type="submit"
+                  class="btn btn-login">
+            Sign In
+          </button>
+
+        </form>
+
+
+        <!-- Register -->
+        <div class="register-section">
+
+          <span>
+            Don't have an account?
+          </span>
+
+          <a routerLink="/register"
+             class="register-link">
+            Create Account
+          </a>
+
+        </div>
+
+      </div>
 
     </div>
 
-    <!-- Password -->
-    <div class="form-group">
 
-      <label for="password">Password</label>
-
-      <input id="password"
-             type="password"
-             formControlName="password"
-             placeholder="Enter your password" />
-
-      @if (loginForm.controls.password.touched &&
-      loginForm.controls.password.invalid) {
-
-      <small class="error">
-        Password is required.
-      </small>
-
-      }
-
+    <!-- Footer -->
+    <div class="copyright">
+      © 2026 Employee Management System
     </div>
 
-    <button type="submit"
-            [disabled]="loginForm.invalid">
-
-      Login
-
-    </button>
-
-  </form>
-
-  <p>
-    <a routerLink="/forgot-password">
-      Forgot Password?
-    </a>
-  </p>
-
-  <p>
-    Don't have an account?
-    <a routerLink="/register">
-      Register
-    </a>
-  </p>
+  </div>
 
 </div>

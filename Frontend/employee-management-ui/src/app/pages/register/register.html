@@ -1,82 +1,169 @@
-<div class="register-container">
+<div class="auth-page">
 
-  <h2>Create Account</h2>
+  <div class="register-container">
 
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <!-- Register Card -->
+    <div class="card auth-card">
 
-    <!-- Name -->
-    <div class="form-group">
+      <div class="card-body">
 
-      <label for="name">Name</label>
+        <!-- Header -->
+        <div class="register-header">
+          <h2 class="auth-title">Create Account</h2>
 
-      <input id="name"
-             type="text"
-             formControlName="name"
-             placeholder="Enter your name" />
+          <p class="auth-subtitle">
+            Register your account to get started
+          </p>
+        </div>
 
-      @if (registerForm.controls.name.touched &&
-      registerForm.controls.name.invalid) {
 
-      <small class="error">
-        Name is required.
-      </small>
-      }
+        <!-- Register Form -->
+        <form [formGroup]="registerForm"
+              (ngSubmit)="onSubmit()">
+
+          <!-- First Name -->
+          <div class="form-field">
+
+            <label for="firstName"
+                   class="form-label custom-label">
+              First Name
+            </label>
+
+            <input id="firstName"
+                   type="text"
+                   class="form-control custom-input"
+                   formControlName="firstName"
+                   placeholder="Enter first name" />
+
+            @if (
+            registerForm.controls.firstName.touched &&
+            registerForm.controls.firstName.invalid
+            ) {
+            <div class="invalid-message">
+              First name is required.
+            </div>
+            }
+
+          </div>
+
+
+          <!-- Last Name -->
+          <div class="form-field">
+
+            <label for="lastName"
+                   class="form-label custom-label">
+              Last Name
+            </label>
+
+            <input id="lastName"
+                   type="text"
+                   class="form-control custom-input"
+                   formControlName="lastName"
+                   placeholder="Enter last name" />
+
+            @if (
+            registerForm.controls.lastName.touched &&
+            registerForm.controls.lastName.invalid
+            ) {
+            <div class="invalid-message">
+              Last name is required.
+            </div>
+            }
+
+          </div>
+
+
+          <!-- Email -->
+          <div class="form-field">
+
+            <label for="email"
+                   class="form-label custom-label">
+              Email Address
+            </label>
+
+            <input id="email"
+                   type="email"
+                   class="form-control custom-input"
+                   formControlName="email"
+                   placeholder="Enter your email" />
+
+            @if (
+            registerForm.controls.email.touched &&
+            registerForm.controls.email.invalid
+            ) {
+            <div class="invalid-message">
+              Please enter a valid email address.
+            </div>
+            }
+
+          </div>
+
+
+          <!-- Password -->
+          <div class="form-field">
+
+            <label for="password"
+                   class="form-label custom-label">
+              Password
+            </label>
+
+            <input id="password"
+                   type="password"
+                   class="form-control custom-input"
+                   formControlName="password"
+                   placeholder="Enter password" />
+
+            @if (
+            registerForm.controls.password.touched &&
+            registerForm.controls.password.invalid
+            ) {
+            <div class="invalid-message">
+              Password must be at least 6 characters.
+            </div>
+            }
+
+          </div>
+
+
+          <!-- Register Button -->
+          <button type="submit"
+                  class="btn btn-register">
+            Create Account
+          </button>
+
+        </form>
+
+
+        <!-- Login Link -->
+        <div class="login-section">
+
+          <span>
+            Already have an account?
+          </span>
+
+          <a routerLink="/login"
+             class="login-link">
+            Sign In
+          </a>
+
+        </div>
+
+        <!-- Back Button -->
+        <a routerLink="/login"
+           class="back-button">
+          ← Back to Login
+        </a>
+
+      </div>
 
     </div>
 
 
-    <!-- Email -->
-    <div class="form-group">
-
-      <label for="email">Email</label>
-
-      <input id="email"
-             type="email"
-             formControlName="email"
-             placeholder="Enter your email" />
-
-      @if (registerForm.controls.email.touched &&
-      registerForm.controls.email.invalid) {
-
-      <small class="error">
-        Please enter a valid email.
-      </small>
-      }
-
+    <!-- Footer -->
+    <div class="copyright">
+      © 2026 Employee Management System
     </div>
 
-
-    <!-- Password -->
-    <div class="form-group">
-
-      <label for="password">Password</label>
-
-      <input id="password"
-             type="password"
-             formControlName="password"
-             placeholder="Enter your password" />
-
-      @if (registerForm.controls.password.touched &&
-      registerForm.controls.password.invalid) {
-
-      <small class="error">
-        Password must be at least 6 characters.
-      </small>
-      }
-
-    </div>
-
-
-    <button type="submit">
-      Register
-    </button>
-
-  </form>
-
-
-  <p>
-    Already have an account?
-    <a routerLink="/login">Login</a>
-  </p>
+  </div>
 
 </div>

@@ -1,9 +1,15 @@
 import { Component } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-register',
+  standalone: true,
   imports: [
     ReactiveFormsModule,
     RouterLink
@@ -15,17 +21,20 @@ export class Register {
 
   registerForm;
 
-  constructor(private fb: FormBuilder) {
-
+  constructor(
+    private fb: FormBuilder,
+    private authService: AuthService,
+    private router: Router
+  ) {
     this.registerForm = this.fb.group({
-      name: ['', Validators.required],
+      firstName: ['', Validators.required],
+      lastName: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       password: ['', [
         Validators.required,
         Validators.minLength(6)
       ]]
     });
-
   }
 
   onSubmit(): void {
@@ -35,6 +44,18 @@ export class Register {
       return;
     }
 
-    console.log('Registration Data:', this.registerForm.value);
+    this.authService.register(this.registerForm.value).subscribe({
+      next: (response) => {
+        alert(response.message);
+        this.router.navigate(['/login']);
+      },
+
+      error: (error) => {
+        alert(
+          error.error?.message ||
+          'Registration failed'
+        );
+      }
+    });
   }
 }

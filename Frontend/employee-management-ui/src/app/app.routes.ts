@@ -15,30 +15,37 @@ export const routes: Routes = [
   },
   {
     path: 'register',
-    component: Register
+    component: Register,
+    data: { renderMode: 'client' }
   },
   {
     path: 'login',
-    component: Login
+    component: Login,
+    data: { renderMode: 'client' }
   },
   {
     path: 'forgot-password',
-    component: ForgotPassword
+    component: ForgotPassword,
+    data: { renderMode: 'client' }
   },
   {
     path: 'reset-password',
-    component: ResetPassword
+    component: ResetPassword,
+    data: { renderMode: 'client' }
   },
   {
     path: 'dashboard',
-    component: Dashboard
+    component: Dashboard,
+    data: { renderMode: 'client' }
   },
   {
     path: 'employee',
-    component: Employee
+    component: Employee,
+    data: { renderMode: 'client' }
   },
   {
     path: '**',
-    component: PageNotFound
+    component: PageNotFound,
+    data: { renderMode: 'client' }
   }
 ];
