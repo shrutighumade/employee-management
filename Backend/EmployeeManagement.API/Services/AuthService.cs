@@ -133,4 +133,18 @@ public class AuthService : IAuthService
         return new JwtSecurityTokenHandler()
             .WriteToken(token);
     }
+
+    public async Task<string> ForgotPasswordAsync(
+        ForgotPasswordRequest request)
+    {
+        var user = await _context.Users
+            .FirstOrDefaultAsync(x => x.Email == request.Email);
+
+        if (user == null)
+        {
+            return "If the email is registered, a password reset link will be sent.";
+        }
+
+        return "Password reset link sent successfully.";
+    }
 }

@@ -1,10 +1,11 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormBuilder,
   ReactiveFormsModule,
   Validators
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { catchError, EMPTY, tap } from 'rxjs';
 import { AuthService } from '../../services/auth';
 
 @Component({
@@ -18,44 +19,43 @@ import { AuthService } from '../../services/auth';
   styleUrl: './register.css'
 })
 export class Register {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+  
+  protected registerForm =  this.fb.group({
+    firstName: ['', Validators.required],
+    lastName: ['', Validators.required],
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [
+      Validators.required,
+      Validators.minLength(6)
+    ]]
+  });
 
-  registerForm;
-
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
-    this.registerForm = this.fb.group({
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [
-        Validators.required,
-        Validators.minLength(6)
-      ]]
-    });
-  }
-
-  onSubmit(): void {
+  protected onSubmit(): void {
 
     if (this.registerForm.invalid) {
       this.registerForm.markAllAsTouched();
       return;
     }
 
-    this.authService.register(this.registerForm.value).subscribe({
-      next: (response) => {
-        alert(response.message);
-        this.router.navigate(['/login']);
-      },
+    this.authService.register(this.registerForm.value)
+      .pipe(
+        tap((response) => {
+          alert(response.message || 'Registration successful!');
+          this.router.navigate(['/login']);
+        }),
+        catchError((error) => {
+          console.error('Registration failed:', error);
 
-      error: (error) => {
-        alert(
-          error.error?.message ||
-          'Registration failed'
-        );
-      }
-    });
+          alert(
+            error.error?.message || 'Registration failed. Please try again.'
+          );
+
+          return EMPTY;
+        })
+      )
+      .subscribe();
   }
 }

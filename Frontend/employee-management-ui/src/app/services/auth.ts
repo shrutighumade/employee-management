@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -7,27 +7,29 @@ import { Observable } from 'rxjs';
 })
 export class AuthService {
 
+  private http = inject(HttpClient);
+
   private apiUrl = 'http://localhost:5261/api/Auth';
 
-  constructor(private http: HttpClient) { }
+  
 
-  register(data: any): Observable<any> {
+  public register(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/register`, data);
   }
 
-  login(data: any): Observable<any> {
+  public login(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, data);
   }
 
-  forgotPassword(data: any): Observable<any> {
+  public forgotPassword(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/forgot-password`, data);
   }
 
-  resetPassword(data: any): Observable<any> {
+  public resetPassword(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/reset-password`, data);
   }
 
-  getProfile(): Observable<any> {
+  public getProfile(): Observable<any> {
     return this.http.get(`${this.apiUrl}/profile`);
   }
 }

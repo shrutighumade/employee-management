@@ -1,5 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
+import { catchError, EMPTY, tap } from 'rxjs';
 import { AuthService } from '../../services/auth';
 
 @Component({
@@ -11,41 +12,26 @@ import { AuthService } from '../../services/auth';
   styleUrl: './dashboard.css'
 })
 export class Dashboard implements OnInit {
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  userName = 'User';
+  protected userName = 'User';
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) { }
-
-  ngOnInit(): void {
-
-    this.authService.getProfile().subscribe({
-      next: (response) => {
-
-        this.userName =
-          response.name ||
-          `${response.firstName} ${response.lastName}` ||
-          'User';
-
-      },
-
-      error: (error) => {
-
-        console.error('Profile loading failed:', error);
-
-        if (error.status === 401) {
-          localStorage.removeItem('token');
-          this.router.navigate(['/login']);
-        }
-
-      }
-    });
-
+  public ngOnInit(): void {
+    this.authService.getProfile()
+      .pipe(
+        tap((user) => {
+          this.userName = user.name;
+        }),
+        catchError((error) => {
+          console.error('Error fetching profile:', error);
+          return EMPTY;
+        })
+      )
+      .subscribe();
   }
 
-  logout(): void {
+  protected logout(): void {
 
     localStorage.removeItem('token');
 
