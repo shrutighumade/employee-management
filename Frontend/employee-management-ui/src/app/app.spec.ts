@@ -1,29 +1,17 @@
-import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
+import { beforeEach, describe, expect, it } from 'vitest';
+
 import { provideRouter } from '@angular/router';
 import { App } from './app';
-
-beforeAll(() => {
-  try {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting()
-    );
-  } catch {
-    // Environment already initialized
-  }
-});
 
 describe('App Component', () => {
   let component: App;
   let fixture: ComponentFixture<App>;
 
   beforeEach(async () => {
-    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [App],
-      providers: [provideRouter([])]
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(App);
@@ -41,6 +29,7 @@ describe('App Component', () => {
 
   it('should render router outlet and navbar', () => {
     const compiled = fixture.nativeElement as HTMLElement;
+
     expect(compiled.querySelector('app-navbar')).toBeTruthy();
     expect(compiled.querySelector('router-outlet')).toBeTruthy();
   });
