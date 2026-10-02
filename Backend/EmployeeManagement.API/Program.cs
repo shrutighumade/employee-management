@@ -106,7 +106,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
-app.MapGet("/", () => new { Messsage = "🚀 Employee Management API is up and running successfully!" });
+app.MapGet("/", () => new { Message = "🚀 Employee Management API is up and running successfully!" });
 
 if (app.Environment.IsDevelopment())
 {
