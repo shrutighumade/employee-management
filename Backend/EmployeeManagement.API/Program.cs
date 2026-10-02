@@ -106,6 +106,8 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.MapGet("/", () => new { Message = "🚀 Employee Management API is up and running successfully!" });
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

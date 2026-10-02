@@ -1,9 +1,10 @@
-import '@angular/compiler';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { runInInjectionContext, Injector } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import '@angular/compiler';
+import { Injector, runInInjectionContext } from '@angular/core';
 import { of } from 'rxjs';
-import { EmployeeService, IEmployee, IPaginatedResponse } from './employee.service';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { IEmployee, IPaginatedResponse } from '../models';
+import { EmployeeService } from './employee.service';
 
 describe('EmployeeService', () => {
   let service: EmployeeService;
@@ -14,13 +15,11 @@ describe('EmployeeService', () => {
       get: vi.fn(),
       post: vi.fn(),
       put: vi.fn(),
-      delete: vi.fn()
+      delete: vi.fn(),
     };
 
     const injector = Injector.create({
-      providers: [
-        { provide: HttpClient, useValue: mockHttpClient }
-      ]
+      providers: [{ provide: HttpClient, useValue: mockHttpClient }],
     });
 
     runInInjectionContext(injector, () => {
@@ -43,18 +42,18 @@ describe('EmployeeService', () => {
           leavesCount: 26,
           joingDate: '2024-11-04',
           dateOfBirth: '2001-12-11',
-          phoneNumber: '7263069877'
-        }
+          phoneNumber: '7263069877',
+        },
       ],
       totalCount: 1,
       page: 1,
       pageSize: 5,
-      totalPages: 1
+      totalPages: 1,
     };
 
     mockHttpClient.get.mockReturnValue(of(mockResponse));
 
-    service.getEmployees(1, 5, '').subscribe(res => {
+    service.getEmployees(1, 5, '').subscribe((res) => {
       expect(res.items.length).toBe(1);
       expect(res.items[0].name).toBe('Hrushikesh');
       expect(res.totalCount).toBe(1);
@@ -71,18 +70,21 @@ describe('EmployeeService', () => {
       leavesCount: 15,
       joingDate: '2025-01-10',
       dateOfBirth: '1995-04-12',
-      phoneNumber: '9876543211'
+      phoneNumber: '9876543211',
     };
 
     const mockCreated: IEmployee = { id: 10, ...newEmp };
     mockHttpClient.post.mockReturnValue(of(mockCreated));
 
-    service.createEmployee(newEmp).subscribe(res => {
+    service.createEmployee(newEmp).subscribe((res) => {
       expect(res.id).toBe(10);
       expect(res.name).toBe('John Doe');
     });
 
-    expect(mockHttpClient.post).toHaveBeenCalledWith(expect.stringContaining('/api/Employees'), newEmp);
+    expect(mockHttpClient.post).toHaveBeenCalledWith(
+      expect.stringContaining('/api/Employees'),
+      newEmp,
+    );
   });
 
   it('should delete an employee via DELETE', () => {
@@ -90,6 +92,8 @@ describe('EmployeeService', () => {
 
     service.deleteEmployee(10).subscribe();
 
-    expect(mockHttpClient.delete).toHaveBeenCalledWith(expect.stringContaining('/api/Employees/10'));
+    expect(mockHttpClient.delete).toHaveBeenCalledWith(
+      expect.stringContaining('/api/Employees/10'),
+    );
   });
 });

@@ -1,5 +1,6 @@
 :root {
-  --primary-font: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --primary-font:
+    'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --bg-main: #f8fafc;
   --card-bg: #ffffff;
   --text-main: #0f172a;

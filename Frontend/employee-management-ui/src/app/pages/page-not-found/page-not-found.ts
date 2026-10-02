@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Location } from '@angular/common';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
 
 @Component({
@@ -7,7 +7,7 @@ import { Router, RouterModule } from '@angular/router';
   imports: [RouterModule],
   templateUrl: './page-not-found.html',
   styleUrl: './page-not-found.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class PageNotFound {
   private readonly location = inject(Location);

@@ -5,11 +5,9 @@ import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [
-    RouterLink
-  ],
+  imports: [RouterLink],
   templateUrl: './dashboard.html',
-  styleUrl: './dashboard.css'
+  styleUrl: './dashboard.css',
 })
 export class Dashboard implements OnInit {
   private authService = inject(AuthService);
@@ -18,7 +16,8 @@ export class Dashboard implements OnInit {
   protected userName = 'User';
 
   public ngOnInit(): void {
-    this.authService.getProfile()
+    this.authService
+      .getProfile()
       .pipe(
         tap((user) => {
           this.userName = user.name;
@@ -26,17 +25,13 @@ export class Dashboard implements OnInit {
         catchError((error) => {
           console.error('Error fetching profile:', error);
           return EMPTY;
-        })
+        }),
       )
       .subscribe();
   }
 
   protected logout(): void {
-
     localStorage.removeItem('token');
-
     this.router.navigate(['/login']);
-
   }
-
 }

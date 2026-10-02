@@ -1,162 +1,101 @@
 <div class="auth-page">
-
   <div class="register-container">
-
     <!-- Register Card -->
     <div class="card auth-card">
-
       <div class="card-body">
-
         <!-- Header -->
         <div class="register-header">
           <h2 class="auth-title">Create Account</h2>
 
-          <p class="auth-subtitle">
-            Register your account to get started
-          </p>
+          <p class="auth-subtitle">Register your account to get started</p>
         </div>
 
-
         <!-- Register Form -->
-        <form [formGroup]="registerForm"
-              (ngSubmit)="onSubmit()">
-
+        <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
           <!-- First Name -->
           <div class="form-field">
+            <label for="firstName" class="form-label custom-label"> First Name </label>
 
-            <label for="firstName"
-                   class="form-label custom-label">
-              First Name
-            </label>
-
-            <input id="firstName"
-                   type="text"
-                   class="form-control custom-input"
-                   formControlName="firstName"
-                   placeholder="Enter first name" />
+            <input
+              id="firstName"
+              type="text"
+              class="form-control custom-input"
+              formControlName="firstName"
+              placeholder="Enter first name"
+            />
 
             @if (
-            registerForm.controls.firstName.touched &&
-            registerForm.controls.firstName.invalid
+              registerForm.controls.firstName.touched && registerForm.controls.firstName.invalid
             ) {
-            <div class="invalid-message">
-              First name is required.
-            </div>
+              <div class="invalid-message">First name is required.</div>
             }
-
           </div>
-
 
           <!-- Last Name -->
           <div class="form-field">
+            <label for="lastName" class="form-label custom-label"> Last Name </label>
 
-            <label for="lastName"
-                   class="form-label custom-label">
-              Last Name
-            </label>
+            <input
+              id="lastName"
+              type="text"
+              class="form-control custom-input"
+              formControlName="lastName"
+              placeholder="Enter last name"
+            />
 
-            <input id="lastName"
-                   type="text"
-                   class="form-control custom-input"
-                   formControlName="lastName"
-                   placeholder="Enter last name" />
-
-            @if (
-            registerForm.controls.lastName.touched &&
-            registerForm.controls.lastName.invalid
-            ) {
-            <div class="invalid-message">
-              Last name is required.
-            </div>
+            @if (registerForm.controls.lastName.touched && registerForm.controls.lastName.invalid) {
+              <div class="invalid-message">Last name is required.</div>
             }
-
           </div>
-
 
           <!-- Email -->
           <div class="form-field">
+            <label for="email" class="form-label custom-label"> Email Address </label>
 
-            <label for="email"
-                   class="form-label custom-label">
-              Email Address
-            </label>
+            <input
+              id="email"
+              type="email"
+              class="form-control custom-input"
+              formControlName="email"
+              placeholder="Enter your email"
+            />
 
-            <input id="email"
-                   type="email"
-                   class="form-control custom-input"
-                   formControlName="email"
-                   placeholder="Enter your email" />
-
-            @if (
-            registerForm.controls.email.touched &&
-            registerForm.controls.email.invalid
-            ) {
-            <div class="invalid-message">
-              Please enter a valid email address.
-            </div>
+            @if (registerForm.controls.email.touched && registerForm.controls.email.invalid) {
+              <div class="invalid-message">Please enter a valid email address.</div>
             }
-
           </div>
-
 
           <!-- Password -->
           <div class="form-field">
+            <label for="password" class="form-label custom-label"> Password </label>
 
-            <label for="password"
-                   class="form-label custom-label">
-              Password
-            </label>
+            <input
+              id="password"
+              type="password"
+              class="form-control custom-input"
+              formControlName="password"
+              placeholder="Enter password"
+            />
 
-            <input id="password"
-                   type="password"
-                   class="form-control custom-input"
-                   formControlName="password"
-                   placeholder="Enter password" />
-
-            @if (
-            registerForm.controls.password.touched &&
-            registerForm.controls.password.invalid
-            ) {
-            <div class="invalid-message">
-              Password must be at least 6 characters.
-            </div>
+            @if (registerForm.controls.password.touched && registerForm.controls.password.invalid) {
+              <div class="invalid-message">Password must be at least 6 characters.</div>
             }
-
           </div>
 
-
           <!-- Register Button -->
-          <button type="submit"
-                  class="btn btn-register">
-            Create Account
-          </button>
-
+          <button type="submit" class="btn btn-register">Create Account</button>
         </form>
-
 
         <!-- Login Link -->
         <div class="login-section">
+          <span> Already have an account? </span>
 
-          <span>
-            Already have an account?
-          </span>
-
-          <a routerLink="/login"
-             class="login-link">
-            Sign In
-          </a>
-
+          <a routerLink="/login" class="login-link"> Sign In </a>
         </div>
       </div>
-
     </div>
-
 
     <!-- Footer -->
-    <div class="copyright">
-      © 2026 Employee Management System
-    </div>
-
+    <div class="copyright">© 2026 Employee Management System</div>
   </div>
-
 </div>
