@@ -10,7 +10,6 @@ import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-register',
-  standalone: true,
   imports: [
     ReactiveFormsModule,
     RouterLink
