@@ -21,7 +21,8 @@ import {
   tap,
 } from 'rxjs';
 
-import { EmployeeService, IEmployee } from '../../services/employee.service';
+import { IEmployee } from '../../models';
+import { EmployeeService } from '../../services';
 
 @Component({
   selector: 'app-employee',
