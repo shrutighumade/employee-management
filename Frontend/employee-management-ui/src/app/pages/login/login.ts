@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import {
   FormBuilder,
   ReactiveFormsModule,
@@ -18,21 +18,17 @@ import { AuthService } from '../../services/auth';
   styleUrl: './login.css'
 })
 export class Login {
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  loginForm;
-
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
-    this.loginForm = this.fb.group({
+   protected loginForm= this.fb.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', Validators.required]
     });
-  }
+  
 
-  onSubmit(): void {
+  protected onSubmit(): void {
 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
