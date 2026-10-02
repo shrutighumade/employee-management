@@ -1,9 +1,16 @@
-import { Component } from '@angular/core';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Component, inject } from '@angular/core';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators
+} from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { tap, catchError, of } from 'rxjs';
+import { AuthService } from '../../services/auth';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
   imports: [
     ReactiveFormsModule,
     RouterLink
@@ -13,31 +20,41 @@ import { RouterLink } from '@angular/router';
 })
 export class Login {
 
-  loginForm;
+  private fb = inject(FormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  constructor(private fb: FormBuilder) {
+  protected loginForm = this.fb.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', Validators.required]
+  });
 
-    this.loginForm = this.fb.group({
-      email: ['', [
-        Validators.required,
-        Validators.email
-      ]],
-
-      password: ['', [
-        Validators.required,
-        Validators.minLength(6)
-      ]]
-    });
-
-  }
-
-  onSubmit(): void {
+  protected onSubmit(): void {
 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       return;
     }
 
-    console.log('Login Data:', this.loginForm.value);
+    this.authService.login(this.loginForm.value).pipe(
+      tap((response) => {
+        localStorage.setItem('token', response.token);
+
+        alert(response.message || 'Login successful!');
+
+        this.router.navigate(['/dashboard']);
+      }),
+
+      catchError((error) => {
+        alert(
+          error.error?.message ||
+          'Invalid email or password'
+        );
+
+        console.error('Login Failed!', error);
+
+        return of(null);
+      })
+    ).subscribe();
   }
 }
