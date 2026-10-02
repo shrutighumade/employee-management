@@ -1,6 +1,26 @@
-import { ChangeDetectionStrategy, Component, OnInit, computed, inject, signal } from '@angular/core';
 import { DecimalPipe } from '@angular/common';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  DestroyRef,
+  OnInit,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import {
+  Subject,
+  catchError,
+  debounceTime,
+  distinctUntilChanged,
+  finalize,
+  of,
+  switchMap,
+  tap,
+} from 'rxjs';
+
 import { EmployeeService, IEmployee } from '../../services/employee.service';
 
 @Component({
@@ -8,26 +28,32 @@ import { EmployeeService, IEmployee } from '../../services/employee.service';
   imports: [ReactiveFormsModule, DecimalPipe],
   templateUrl: './employee.html',
   styleUrl: './employee.css',
-  changeDetection: ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class Employee implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly employeeService = inject(EmployeeService);
+  private readonly destroyRef = inject(DestroyRef);
 
-  // Signal State
+  // UI State
   protected readonly employees = signal<IEmployee[]>([]);
-  protected readonly searchQuery = signal<string>('');
-  protected readonly isDrawerOpen = signal<boolean>(false);
+  protected readonly isDrawerOpen = signal(false);
   protected readonly editingIndex = signal<number | null>(null);
   protected readonly deleteConfirmIndex = signal<number | null>(null);
-  protected readonly isLoading = signal<boolean>(false);
+  protected readonly isLoading = signal(false);
   protected readonly errorMessage = signal<string | null>(null);
 
-  // Pagination Signals (Max 5 items per page)
-  protected readonly currentPage = signal<number>(1);
-  protected readonly pageSize = signal<number>(5);
-  protected readonly totalCount = signal<number>(0);
-  protected readonly totalPages = signal<number>(1);
+  // Pagination
+  protected readonly currentPage = signal(1);
+  protected readonly pageSize = signal(5);
+  protected readonly totalCount = signal(0);
+  protected readonly totalPages = signal(1);
+
+  // Search
+  protected readonly searchQuery = signal('');
+
+  private readonly searchSubject = new Subject<string>();
+  private readonly refreshSubject = new Subject<void>();
 
   // Reactive Form
   protected readonly employeeForm = this.fb.nonNullable.group({
@@ -38,84 +64,150 @@ export class Employee implements OnInit {
     leavesCount: [0, [Validators.required, Validators.min(0)]],
     joingDate: ['', Validators.required],
     dateOfBirth: ['', Validators.required],
-    phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]]
+    phoneNumber: ['', [Validators.required, Validators.pattern('^[0-9]{10}$')]],
   });
 
   ngOnInit(): void {
-    this.loadEmployeesFromApi();
+    this.setupEmployeeStream();
+    this.refreshSubject.next();
   }
 
-  protected loadEmployeesFromApi(): void {
+  // =========================
+  // Employee API Stream
+  // =========================
+
+  private setupEmployeeStream(): void {
+    this.searchSubject
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+
+        tap((search) => {
+          this.searchQuery.set(search);
+          this.currentPage.set(1);
+          this.errorMessage.set(null);
+        }),
+
+        switchMap(() => this.loadEmployees$()),
+
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+
+    this.refreshSubject
+      .pipe(
+        switchMap(() => this.loadEmployees$()),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+  }
+
+  private loadEmployees$() {
     this.isLoading.set(true);
     this.errorMessage.set(null);
 
-    this.employeeService
+    return this.employeeService
       .getEmployees(this.currentPage(), this.pageSize(), this.searchQuery())
-      .subscribe({
-        next: (response) => {
-          if (response && Array.isArray(response.items)) {
-            this.employees.set(response.items);
-            this.totalCount.set(response.totalCount);
+      .pipe(
+        tap((response) => {
+          if (response && !Array.isArray(response)) {
+            this.employees.set(response.items ?? []);
+            this.totalCount.set(response.totalCount ?? 0);
             this.totalPages.set(response.totalPages || 1);
-          } else if (Array.isArray(response)) {
-            // Fallback for direct array responses
-            const arr = response as unknown as IEmployee[];
-            this.employees.set(arr.slice(0, 5));
-            this.totalCount.set(arr.length);
-            this.totalPages.set(Math.ceil(arr.length / 5) || 1);
+
+            return;
           }
-          this.isLoading.set(false);
-        },
-        error: () => {
-          this.isLoading.set(false);
+
+          if (Array.isArray(response)) {
+            const employees = response as IEmployee[];
+
+            this.employees.set(employees.slice(0, this.pageSize()));
+            this.totalCount.set(employees.length);
+            this.totalPages.set(Math.ceil(employees.length / this.pageSize()) || 1);
+          }
+        }),
+
+        catchError(() => {
+          this.employees.set([]);
+          this.totalCount.set(0);
+          this.totalPages.set(1);
+
           this.errorMessage.set('Could not load employees from server. Check API connection.');
-        }
-      });
+
+          return of(null);
+        }),
+
+        finalize(() => {
+          this.isLoading.set(false);
+        }),
+      );
   }
 
+  private refreshEmployees(): void {
+    this.refreshSubject.next();
+  }
+
+  // =========================
   // Computed Metrics
+  // =========================
+
   protected readonly totalPayroll = computed(() =>
-    this.employees().reduce((sum, emp) => sum + Number(emp.employeSalary || 0), 0)
+    this.employees().reduce((sum, employee) => sum + Number(employee.employeSalary || 0), 0),
   );
 
   protected readonly avgSalary = computed(() => {
     const count = this.employees().length;
+
     return count > 0 ? Math.round(this.totalPayroll() / count) : 0;
   });
 
   protected readonly totalLeavesCount = computed(() =>
-    this.employees().reduce((sum, emp) => sum + Number(emp.leavesCount || 0), 0)
+    this.employees().reduce((sum, employee) => sum + Number(employee.leavesCount || 0), 0),
   );
 
-  // Pagination Controls
+  // =========================
+  // Pagination
+  // =========================
+
   protected goToPage(page: number): void {
-    if (page >= 1 && page <= this.totalPages()) {
-      this.currentPage.set(page);
-      this.loadEmployeesFromApi();
+    if (page < 1 || page > this.totalPages() || page === this.currentPage()) {
+      return;
     }
+
+    this.currentPage.set(page);
+    this.refreshEmployees();
   }
 
   protected prevPage(): void {
-    if (this.currentPage() > 1) {
-      this.goToPage(this.currentPage() - 1);
-    }
+    this.goToPage(this.currentPage() - 1);
   }
 
   protected nextPage(): void {
-    if (this.currentPage() < this.totalPages()) {
-      this.goToPage(this.currentPage() + 1);
-    }
+    this.goToPage(this.currentPage() + 1);
   }
 
   protected get pagesArray(): number[] {
-    const pages: number[] = [];
-    for (let i = 1; i <= this.totalPages(); i++) {
-      pages.push(i);
-    }
-    return pages;
+    return Array.from({ length: this.totalPages() }, (_, index) => index + 1);
   }
 
-  // Component Actions
+  // =========================
+  // Search
+  // =========================
+
+  protected updateSearchQuery(event: Event): void {
+    const input = event.target as HTMLInputElement;
+
+    this.searchSubject.next(input.value.trim());
+  }
+
+  protected clearSearch(): void {
+    this.searchSubject.next('');
+  }
+
+  // =========================
+  // Drawer
+  // =========================
+
   protected openAddDrawer(): void {
     this.resetForm();
     this.editingIndex.set(null);
@@ -124,20 +216,24 @@ export class Employee implements OnInit {
 
   protected editEmployee(index: number): void {
     const employee = this.employees()[index];
-    if (employee) {
-      this.employeeForm.patchValue({
-        id: employee.id || 0,
-        name: employee.name,
-        employeId: employee.employeId,
-        employeSalary: employee.employeSalary,
-        leavesCount: employee.leavesCount,
-        joingDate: employee.joingDate,
-        dateOfBirth: employee.dateOfBirth,
-        phoneNumber: employee.phoneNumber
-      });
-      this.editingIndex.set(index);
-      this.isDrawerOpen.set(true);
+
+    if (!employee) {
+      return;
     }
+
+    this.employeeForm.patchValue({
+      id: employee.id || 0,
+      name: employee.name,
+      employeId: employee.employeId,
+      employeSalary: employee.employeSalary,
+      leavesCount: employee.leavesCount,
+      joingDate: employee.joingDate,
+      dateOfBirth: employee.dateOfBirth,
+      phoneNumber: employee.phoneNumber,
+    });
+
+    this.editingIndex.set(index);
+    this.isDrawerOpen.set(true);
   }
 
   protected closeDrawer(): void {
@@ -145,18 +241,9 @@ export class Employee implements OnInit {
     this.resetForm();
   }
 
-  protected updateSearchQuery(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.searchQuery.set(input.value);
-    this.currentPage.set(1);
-    this.loadEmployeesFromApi();
-  }
-
-  protected clearSearch(): void {
-    this.searchQuery.set('');
-    this.currentPage.set(1);
-    this.loadEmployeesFromApi();
-  }
+  // =========================
+  // Save Employee
+  // =========================
 
   protected saveEmployee(): void {
     if (this.employeeForm.invalid) {
@@ -165,56 +252,83 @@ export class Employee implements OnInit {
     }
 
     const formValue = this.employeeForm.getRawValue();
-    const index = this.editingIndex();
+    const editingIndex = this.editingIndex();
 
-    if (index === null) {
-      const newEmpPayload = {
-        name: formValue.name,
-        employeId: formValue.employeId,
-        employeSalary: formValue.employeSalary,
-        leavesCount: formValue.leavesCount,
-        joingDate: formValue.joingDate,
-        dateOfBirth: formValue.dateOfBirth,
-        phoneNumber: formValue.phoneNumber
-      };
-
-      this.employeeService.createEmployee(newEmpPayload).subscribe({
-        next: () => {
-          this.loadEmployeesFromApi();
-          this.closeDrawer();
-        },
-        error: (err) => {
-          console.error('Error creating employee:', err);
-        }
-      });
-    } else {
-      const currentEmp = this.employees()[index];
-      const empId = currentEmp.id || formValue.id;
-
-      const updatePayload: IEmployee = {
-        id: empId,
-        name: formValue.name,
-        employeId: formValue.employeId,
-        employeSalary: formValue.employeSalary,
-        leavesCount: formValue.leavesCount,
-        joingDate: formValue.joingDate,
-        dateOfBirth: formValue.dateOfBirth,
-        phoneNumber: formValue.phoneNumber
-      };
-
-      if (empId) {
-        this.employeeService.updateEmployee(empId, updatePayload).subscribe({
-          next: () => {
-            this.loadEmployeesFromApi();
-            this.closeDrawer();
-          },
-          error: (err) => {
-            console.error('Error updating employee:', err);
-          }
-        });
-      }
+    if (editingIndex === null) {
+      this.createEmployee(formValue);
+      return;
     }
+
+    this.updateEmployee(editingIndex, formValue);
   }
+
+  private createEmployee(formValue: ReturnType<typeof this.employeeForm.getRawValue>): void {
+    const payload = {
+      name: formValue.name,
+      employeId: formValue.employeId,
+      employeSalary: formValue.employeSalary,
+      leavesCount: formValue.leavesCount,
+      joingDate: formValue.joingDate,
+      dateOfBirth: formValue.dateOfBirth,
+      phoneNumber: formValue.phoneNumber,
+    };
+
+    this.employeeService
+      .createEmployee(payload)
+      .pipe(
+        tap(() => {
+          this.closeDrawer();
+          this.refreshEmployees();
+        }),
+        catchError((error) => {
+          console.error('Error creating employee:', error);
+          return of(null);
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+  }
+
+  private updateEmployee(
+    index: number,
+    formValue: ReturnType<typeof this.employeeForm.getRawValue>,
+  ): void {
+    const employee = this.employees()[index];
+
+    if (!employee?.id) {
+      return;
+    }
+
+    const payload: IEmployee = {
+      id: employee.id,
+      name: formValue.name,
+      employeId: formValue.employeId,
+      employeSalary: formValue.employeSalary,
+      leavesCount: formValue.leavesCount,
+      joingDate: formValue.joingDate,
+      dateOfBirth: formValue.dateOfBirth,
+      phoneNumber: formValue.phoneNumber,
+    };
+
+    this.employeeService
+      .updateEmployee(employee.id, payload)
+      .pipe(
+        tap(() => {
+          this.closeDrawer();
+          this.refreshEmployees();
+        }),
+        catchError((error) => {
+          console.error('Error updating employee:', error);
+          return of(null);
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
+  }
+
+  // =========================
+  // Delete Employee
+  // =========================
 
   protected promptDelete(index: number): void {
     this.deleteConfirmIndex.set(index);
@@ -226,29 +340,44 @@ export class Employee implements OnInit {
 
   protected confirmDelete(): void {
     const index = this.deleteConfirmIndex();
-    if (index !== null) {
-      this.deleteEmployee(index);
-      this.deleteConfirmIndex.set(null);
+
+    if (index === null) {
+      return;
     }
+
+    this.deleteEmployee(index);
+    this.deleteConfirmIndex.set(null);
   }
 
-  protected deleteEmployee(index: number): void {
-    const targetEmp = this.employees()[index];
-    if (targetEmp && targetEmp.id) {
-      this.employeeService.deleteEmployee(targetEmp.id).subscribe({
-        next: () => {
-          this.loadEmployeesFromApi();
-        },
-        error: (err) => {
-          console.error('Error deleting employee:', err);
-        }
-      });
+  private deleteEmployee(index: number): void {
+    const employee = this.employees()[index];
+
+    if (!employee?.id) {
+      return;
     }
+
+    this.employeeService
+      .deleteEmployee(employee.id)
+      .pipe(
+        tap(() => {
+          this.refreshEmployees();
+        }),
+        catchError((error) => {
+          console.error('Error deleting employee:', error);
+          return of(null);
+        }),
+        takeUntilDestroyed(this.destroyRef),
+      )
+      .subscribe();
 
     if (this.editingIndex() === index) {
       this.closeDrawer();
     }
   }
+
+  // =========================
+  // Form
+  // =========================
 
   protected resetForm(): void {
     this.employeeForm.reset({
@@ -259,10 +388,15 @@ export class Employee implements OnInit {
       leavesCount: 0,
       joingDate: '',
       dateOfBirth: '',
-      phoneNumber: ''
+      phoneNumber: '',
     });
+
     this.editingIndex.set(null);
   }
+
+  // =========================
+  // UI Helpers
+  // =========================
 
   protected getAvatarColor(name: string): string {
     const colors = [
@@ -271,22 +405,29 @@ export class Employee implements OnInit {
       'linear-gradient(135deg, #10b981, #059669)',
       'linear-gradient(135deg, #f59e0b, #d97706)',
       'linear-gradient(135deg, #ec4899, #db2777)',
-      'linear-gradient(135deg, #8b5cf6, #7c3aed)'
+      'linear-gradient(135deg, #8b5cf6, #7c3aed)',
     ];
+
     let hash = 0;
+
     for (let i = 0; i < name.length; i++) {
       hash = name.charCodeAt(i) + ((hash << 5) - hash);
     }
-    const index = Math.abs(hash) % colors.length;
-    return colors[index];
+
+    return colors[Math.abs(hash) % colors.length];
   }
 
   protected getInitials(name: string): string {
-    if (!name) return 'EM';
+    if (!name) {
+      return 'EM';
+    }
+
     const parts = name.trim().split(' ');
+
     if (parts.length >= 2) {
       return (parts[0][0] + parts[1][0]).toUpperCase();
     }
+
     return name.substring(0, 2).toUpperCase();
   }
 }
