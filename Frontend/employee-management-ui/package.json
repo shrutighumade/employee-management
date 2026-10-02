@@ -6,8 +6,7 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test",
-    "serve:ssr:employee-management-ui": "node dist/employee-management-ui/server/server.mjs"
+    "test": "ng test"
   },
   "prettier": {
     "printWidth": 100,

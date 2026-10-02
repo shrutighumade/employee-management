@@ -2,25 +2,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environment/environment';
-
-export interface IEmployee {
-  id?: number;
-  name: string;
-  employeId: number;
-  employeSalary: number;
-  leavesCount: number;
-  joingDate: string;
-  dateOfBirth: string;
-  phoneNumber: string;
-}
-
-export interface IPaginatedResponse<T> {
-  items: T[];
-  totalCount: number;
-  page: number;
-  pageSize: number;
-  totalPages: number;
-}
+import { IEmployee, IPaginatedResponse } from '../models';
 
 @Injectable({
   providedIn: 'root',
