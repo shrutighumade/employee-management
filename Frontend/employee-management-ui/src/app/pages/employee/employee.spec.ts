@@ -1,10 +1,11 @@
 import '@angular/compiler';
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { runInInjectionContext, Injector } from '@angular/core';
+import { Injector, runInInjectionContext } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
 import { of } from 'rxjs';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { IEmployee } from '../../models';
+import { EmployeeService } from '../../services/employee.service';
 import { Employee } from './employee';
-import { EmployeeService, IEmployee } from '../../services/employee.service';
 
 describe('Employee Component', () => {
   let component: Employee;
@@ -12,24 +13,72 @@ describe('Employee Component', () => {
   let formBuilder: FormBuilder;
 
   const sampleEmployees: IEmployee[] = [
-    { id: 1, name: 'Hrushikesh', employeId: 415, employeSalary: 30000, leavesCount: 26, joingDate: '2024-11-04', dateOfBirth: '2001-12-11', phoneNumber: '7263069877' },
-    { id: 2, name: 'Rahul', employeId: 416, employeSalary: 35000, leavesCount: 20, joingDate: '2023-06-10', dateOfBirth: '2000-05-15', phoneNumber: '9876543210' }
+    {
+      id: 1,
+      name: 'Hrushikesh',
+      employeId: 415,
+      employeSalary: 30000,
+      leavesCount: 26,
+      joingDate: '2024-11-04',
+      dateOfBirth: '2001-12-11',
+      phoneNumber: '7263069877',
+    },
+    {
+      id: 2,
+      name: 'Rahul',
+      employeId: 416,
+      employeSalary: 35000,
+      leavesCount: 20,
+      joingDate: '2023-06-10',
+      dateOfBirth: '2000-05-15',
+      phoneNumber: '9876543210',
+    },
   ];
 
   beforeEach(() => {
     formBuilder = new FormBuilder();
     mockEmployeeService = {
-      getEmployees: vi.fn().mockReturnValue(of({ items: sampleEmployees, totalCount: 2, page: 1, pageSize: 5, totalPages: 1 })),
-      createEmployee: vi.fn().mockReturnValue(of({ id: 3, name: 'New Employee', employeId: 417, employeSalary: 40000, leavesCount: 15, joingDate: '2025-01-01', dateOfBirth: '1995-01-01', phoneNumber: '9000000000' })),
-      updateEmployee: vi.fn().mockReturnValue(of({ id: 1, name: 'Hrushikesh Updated', employeId: 415, employeSalary: 35000, leavesCount: 25, joingDate: '2024-11-04', dateOfBirth: '2001-12-11', phoneNumber: '7263069877' })),
-      deleteEmployee: vi.fn().mockReturnValue(of(null))
+      getEmployees: vi
+        .fn()
+        .mockReturnValue(
+          of({ items: sampleEmployees, totalCount: 2, page: 1, pageSize: 5, totalPages: 1 }),
+        ),
+      createEmployee: vi
+        .fn()
+        .mockReturnValue(
+          of({
+            id: 3,
+            name: 'New Employee',
+            employeId: 417,
+            employeSalary: 40000,
+            leavesCount: 15,
+            joingDate: '2025-01-01',
+            dateOfBirth: '1995-01-01',
+            phoneNumber: '9000000000',
+          }),
+        ),
+      updateEmployee: vi
+        .fn()
+        .mockReturnValue(
+          of({
+            id: 1,
+            name: 'Hrushikesh Updated',
+            employeId: 415,
+            employeSalary: 35000,
+            leavesCount: 25,
+            joingDate: '2024-11-04',
+            dateOfBirth: '2001-12-11',
+            phoneNumber: '7263069877',
+          }),
+        ),
+      deleteEmployee: vi.fn().mockReturnValue(of(null)),
     };
 
     const mockInjector = Injector.create({
       providers: [
         { provide: FormBuilder, useValue: formBuilder },
-        { provide: EmployeeService, useValue: mockEmployeeService }
-      ]
+        { provide: EmployeeService, useValue: mockEmployeeService },
+      ],
     });
 
     runInInjectionContext(mockInjector, () => {

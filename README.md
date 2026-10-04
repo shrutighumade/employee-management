@@ -20,27 +20,34 @@ A full-stack, enterprise-grade Employee Management Application built with **Angu
 ## 🚀 How to Run the Application & Tests
 
 ### 1. Run Backend Web API (.NET 9)
+
 ```bash
 cd Backend/EmployeeManagement.API
 dotnet run
 ```
+
 - **API URL**: `http://localhost:5261/api`
 - **Swagger Documentation**: `http://localhost:5261/swagger`
 
 ### 2. Run Backend Unit Tests (xUnit)
+
 ```bash
 dotnet test Backend/EmployeeManagement.Tests/EmployeeManagement.Tests.csproj
 ```
-*(Runs 7/7 passing unit tests covering CRUD, pagination, and search filtering)*
+
+_(Runs 7/7 passing unit tests covering CRUD, pagination, and search filtering)_
 
 ### 3. Run Frontend UI (Angular v20+)
+
 ```bash
 cd Frontend/employee-management-ui
 npm start
 ```
+
 - **Application URL**: `http://localhost:4200/employee`
 
 ### 4. Run Frontend Unit Tests (Vitest)
+
 ```bash
 cd Frontend/employee-management-ui
 npx vitest run

@@ -38,9 +38,9 @@ public class EmployeesController : ControllerBase
                 var searchLower = search.Trim().ToLower();
                 query = query.Where(e =>
                     e.Name.ToLower().Contains(searchLower) ||
-                    e.EmployeId.ToString().Contains(searchLower) ||
+                    e.EmployeeId.ToString().Contains(searchLower) ||
                     e.PhoneNumber.Contains(searchLower) ||
-                    e.JoingDate.Contains(searchLower));
+                    e.JoiningDate.Contains(searchLower));
             }
 
             var totalCount = await query.CountAsync();
@@ -101,10 +101,10 @@ public class EmployeesController : ControllerBase
             var employee = new Employee
             {
                 Name = dto.Name,
-                EmployeId = dto.EmployeId,
-                EmployeSalary = dto.EmployeSalary,
+                EmployeeId = dto.EmployeeId,
+                EmployeeSalary = dto.EmployeeSalary,
                 LeavesCount = dto.LeavesCount,
-                JoingDate = dto.JoingDate,
+                JoiningDate = dto.JoiningDate,
                 DateOfBirth = dto.DateOfBirth,
                 PhoneNumber = dto.PhoneNumber
             };
@@ -133,10 +133,10 @@ public class EmployeesController : ControllerBase
             }
 
             employee.Name = dto.Name;
-            employee.EmployeId = dto.EmployeId;
-            employee.EmployeSalary = dto.EmployeSalary;
+            employee.EmployeeId = dto.EmployeeId;
+            employee.EmployeeSalary = dto.EmployeeSalary;
             employee.LeavesCount = dto.LeavesCount;
-            employee.JoingDate = dto.JoingDate;
+            employee.JoiningDate = dto.JoiningDate;
             employee.DateOfBirth = dto.DateOfBirth;
             employee.PhoneNumber = dto.PhoneNumber;
 

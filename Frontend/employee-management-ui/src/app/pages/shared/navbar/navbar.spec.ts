@@ -1,29 +1,17 @@
-import { describe, it, expect, beforeEach, beforeAll } from 'vitest';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { BrowserDynamicTestingModule, platformBrowserDynamicTesting } from '@angular/platform-browser-dynamic/testing';
 import { provideRouter } from '@angular/router';
-import { Navbar } from './navbar';
+import { beforeEach, describe, expect, it } from 'vitest';
 
-beforeAll(() => {
-  try {
-    TestBed.initTestEnvironment(
-      BrowserDynamicTestingModule,
-      platformBrowserDynamicTesting()
-    );
-  } catch {
-    // Environment already initialized
-  }
-});
+import { Navbar } from './navbar';
 
 describe('Navbar Component', () => {
   let component: Navbar;
   let fixture: ComponentFixture<Navbar>;
 
   beforeEach(async () => {
-    TestBed.resetTestingModule();
     await TestBed.configureTestingModule({
       imports: [Navbar],
-      providers: [provideRouter([])]
+      providers: [provideRouter([])],
     }).compileComponents();
 
     fixture = TestBed.createComponent(Navbar);
@@ -36,10 +24,14 @@ describe('Navbar Component', () => {
   });
 
   it('should toggle mobile menu signal state', () => {
-    expect((component as any).isMobileMenuOpen()).toBeFalse();
+    expect((component as any).isMobileMenuOpen()).toBe(false);
+
     (component as any).toggleMobileMenu();
-    expect((component as any).isMobileMenuOpen()).toBeTrue();
+
+    expect((component as any).isMobileMenuOpen()).toBe(true);
+
     (component as any).toggleMobileMenu();
-    expect((component as any).isMobileMenuOpen()).toBeFalse();
+
+    expect((component as any).isMobileMenuOpen()).toBe(false);
   });
 });

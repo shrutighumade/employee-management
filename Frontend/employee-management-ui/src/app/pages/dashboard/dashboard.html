@@ -1,86 +1,45 @@
 <div class="dashboard">
-
   <!-- Header -->
 
   <header class="header">
+    <div class="logo">Employee Management</div>
 
-    <div class="logo">
-      Employee Management
-    </div>
-
-    <button class="logout-btn"
-            (click)="logout()">
-
-      Logout
-
-    </button>
-
+    <button class="logout-btn" (click)="logout()">Logout</button>
   </header>
-
 
   <!-- Main Content -->
 
   <main class="dashboard-content">
+    <h1>Welcome, {{ userName }} 👋</h1>
 
-    <h1>
-      Welcome, {{ userName }} 👋
-    </h1>
-
-    <p class="subtitle">
-      Welcome to your dashboard.
-    </p>
-
+    <p class="subtitle">Welcome to your dashboard.</p>
 
     <!-- Cards -->
 
     <div class="cards">
-
       <div class="card">
-
         <h3>My Profile</h3>
 
-        <p>
-          View and update your profile information.
-        </p>
+        <p>View and update your profile information.</p>
 
-        <a routerLink="/profile">
-          View Profile
-        </a>
-
+        <a routerLink="/profile"> View Profile </a>
       </div>
 
-
       <div class="card">
-
         <h3>Change Password</h3>
 
-        <p>
-          Update your account password.
-        </p>
+        <p>Update your account password.</p>
 
-        <a routerLink="/change-password">
-          Change Password
-        </a>
-
+        <a routerLink="/change-password"> Change Password </a>
       </div>
-
 
       <div class="card">
-
         <h3>Account</h3>
 
-        <p>
-          Manage your account settings.
-        </p>
+        <p>Manage your account settings.</p>
 
-        <a routerLink="/profile">
-          Account Details
-        </a>
-
+        <a routerLink="/profile"> Account Details </a>
       </div>
-
     </div>
-
   </main>
-
 </div>

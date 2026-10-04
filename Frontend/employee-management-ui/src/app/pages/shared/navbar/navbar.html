@@ -19,7 +19,11 @@
       aria-label="Toggle navigation menu"
       [attr.aria-expanded]="isMobileMenuOpen()"
     >
-      <i class="fa-solid" [class.fa-bars]="!isMobileMenuOpen()" [class.fa-xmark]="isMobileMenuOpen()"></i>
+      <i
+        class="fa-solid"
+        [class.fa-bars]="!isMobileMenuOpen()"
+        [class.fa-xmark]="isMobileMenuOpen()"
+      ></i>
     </button>
 
     <!-- Nav Links & Actions -->
@@ -72,7 +76,13 @@
           </div>
         </div>
 
-        <button type="button" class="btn-logout" (click)="logout()" title="Logout of system" aria-label="Logout">
+        <button
+          type="button"
+          class="btn-logout"
+          (click)="logout()"
+          title="Logout of system"
+          aria-label="Logout"
+        >
           <i class="fa-solid fa-arrow-right-from-bracket"></i>
           <span class="logout-text">Logout</span>
         </button>
