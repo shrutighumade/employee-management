@@ -10,4 +10,6 @@ public class Employee
     public string JoiningDate { get; set; } = string.Empty;
     public string DateOfBirth { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
+    public int DepartmentId { get; set; }
+    public Department Department { get; set; } = null!;
 }

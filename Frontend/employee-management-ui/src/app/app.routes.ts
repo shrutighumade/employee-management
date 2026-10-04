@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 import { Dashboard } from './pages/dashboard/dashboard';
+import { Department } from './pages/department/department';
 import { Employee } from './pages/employee/employee';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { Login } from './pages/login/login';
@@ -41,6 +42,11 @@ export const routes: Routes = [
   {
     path: 'employee',
     component: Employee,
+    data: { renderMode: 'client' },
+  },
+  {
+    path: 'department',
+    component: Department,
     data: { renderMode: 'client' },
   },
   {

@@ -19,18 +19,28 @@ public class EmployeesControllerTests
         return new AppDbContext(options);
     }
 
+    private Department SeedDepartment(AppDbContext context, string name = "Engineering")
+    {
+        var dept = new Department { Name = name, Description = "", Location = "" };
+        context.Departments.Add(dept);
+        context.SaveChanges();
+        return dept;
+    }
+
     [Fact]
     public async Task GetEmployees_ReturnsPaginatedList_WithCorrectItemsAndMetadata()
     {
         // Arrange
         using var context = GetInMemoryDbContext();
+        var dept = SeedDepartment(context);
+
         context.Employees.AddRange(
-            new Employee { Name = "Emp 1", EmployeId = 101, EmployeSalary = 30000, LeavesCount = 10, JoingDate = "2024-01-01", DateOfBirth = "2000-01-01", PhoneNumber = "1000000001" },
-            new Employee { Name = "Emp 2", EmployeId = 102, EmployeSalary = 35000, LeavesCount = 12, JoingDate = "2024-01-02", DateOfBirth = "2000-01-02", PhoneNumber = "1000000002" },
-            new Employee { Name = "Emp 3", EmployeId = 103, EmployeSalary = 40000, LeavesCount = 14, JoingDate = "2024-01-03", DateOfBirth = "2000-01-03", PhoneNumber = "1000000003" },
-            new Employee { Name = "Emp 4", EmployeId = 104, EmployeSalary = 45000, LeavesCount = 16, JoingDate = "2024-01-04", DateOfBirth = "2000-01-04", PhoneNumber = "1000000004" },
-            new Employee { Name = "Emp 5", EmployeId = 105, EmployeSalary = 50000, LeavesCount = 18, JoingDate = "2024-01-05", DateOfBirth = "2000-01-05", PhoneNumber = "1000000005" },
-            new Employee { Name = "Emp 6", EmployeId = 106, EmployeSalary = 55000, LeavesCount = 20, JoingDate = "2024-01-06", DateOfBirth = "2000-01-06", PhoneNumber = "1000000006" }
+            new Employee { Name = "Emp 1", EmployeeId = 101, EmployeeSalary = 30000, LeavesCount = 10, JoiningDate = "2024-01-01", DateOfBirth = "2000-01-01", PhoneNumber = "1000000001", DepartmentId = dept.Id },
+            new Employee { Name = "Emp 2", EmployeeId = 102, EmployeeSalary = 35000, LeavesCount = 12, JoiningDate = "2024-01-02", DateOfBirth = "2000-01-02", PhoneNumber = "1000000002", DepartmentId = dept.Id },
+            new Employee { Name = "Emp 3", EmployeeId = 103, EmployeeSalary = 40000, LeavesCount = 14, JoiningDate = "2024-01-03", DateOfBirth = "2000-01-03", PhoneNumber = "1000000003", DepartmentId = dept.Id },
+            new Employee { Name = "Emp 4", EmployeeId = 104, EmployeeSalary = 45000, LeavesCount = 16, JoiningDate = "2024-01-04", DateOfBirth = "2000-01-04", PhoneNumber = "1000000004", DepartmentId = dept.Id },
+            new Employee { Name = "Emp 5", EmployeeId = 105, EmployeeSalary = 50000, LeavesCount = 18, JoiningDate = "2024-01-05", DateOfBirth = "2000-01-05", PhoneNumber = "1000000005", DepartmentId = dept.Id },
+            new Employee { Name = "Emp 6", EmployeeId = 106, EmployeeSalary = 55000, LeavesCount = 20, JoiningDate = "2024-01-06", DateOfBirth = "2000-01-06", PhoneNumber = "1000000006", DepartmentId = dept.Id }
         );
         await context.SaveChangesAsync();
 
@@ -55,9 +65,11 @@ public class EmployeesControllerTests
     {
         // Arrange
         using var context = GetInMemoryDbContext();
+        var dept = SeedDepartment(context);
+
         context.Employees.AddRange(
-            new Employee { Name = "Alice Johnson", EmployeId = 201, EmployeSalary = 45000, LeavesCount = 15, JoingDate = "2023-05-10", DateOfBirth = "1995-02-10", PhoneNumber = "9876543210" },
-            new Employee { Name = "Bob Smith", EmployeId = 202, EmployeSalary = 50000, LeavesCount = 10, JoingDate = "2022-03-15", DateOfBirth = "1992-08-20", PhoneNumber = "9123456780" }
+            new Employee { Name = "Alice Johnson", EmployeeId = 201, EmployeeSalary = 45000, LeavesCount = 15, JoiningDate = "2023-05-10", DateOfBirth = "1995-02-10", PhoneNumber = "9876543210", DepartmentId = dept.Id },
+            new Employee { Name = "Bob Smith", EmployeeId = 202, EmployeeSalary = 50000, LeavesCount = 10, JoiningDate = "2022-03-15", DateOfBirth = "1992-08-20", PhoneNumber = "9123456780", DepartmentId = dept.Id }
         );
         await context.SaveChangesAsync();
 
@@ -79,7 +91,8 @@ public class EmployeesControllerTests
     {
         // Arrange
         using var context = GetInMemoryDbContext();
-        var employee = new Employee { Name = "Charlie", EmployeId = 301, EmployeSalary = 60000, LeavesCount = 20, JoingDate = "2024-02-01", DateOfBirth = "1990-01-01", PhoneNumber = "9998887770" };
+        var dept = SeedDepartment(context);
+        var employee = new Employee { Name = "Charlie", EmployeeId = 301, EmployeeSalary = 60000, LeavesCount = 20, JoiningDate = "2024-02-01", DateOfBirth = "1990-01-01", PhoneNumber = "9998887770", DepartmentId = dept.Id };
         context.Employees.Add(employee);
         await context.SaveChangesAsync();
 
@@ -113,16 +126,18 @@ public class EmployeesControllerTests
     {
         // Arrange
         using var context = GetInMemoryDbContext();
+        var dept = SeedDepartment(context);
         var controller = new EmployeesController(context);
         var dto = new CreateEmployeeDto
         {
             Name = "David Warner",
-            EmployeId = 401,
-            EmployeSalary = 75000,
+            EmployeeId = 401,
+            EmployeeSalary = 75000,
             LeavesCount = 18,
-            JoingDate = "2024-06-01",
+            JoiningDate = "2024-06-01",
             DateOfBirth = "1988-10-27",
-            PhoneNumber = "9876543212"
+            PhoneNumber = "9876543212",
+            DepartmentId = dept.Id
         };
 
         // Act
@@ -141,7 +156,8 @@ public class EmployeesControllerTests
     {
         // Arrange
         using var context = GetInMemoryDbContext();
-        var employee = new Employee { Name = "Eve", EmployeId = 501, EmployeSalary = 50000, LeavesCount = 12, JoingDate = "2023-01-01", DateOfBirth = "1996-04-04", PhoneNumber = "9000000001" };
+        var dept = SeedDepartment(context);
+        var employee = new Employee { Name = "Eve", EmployeeId = 501, EmployeeSalary = 50000, LeavesCount = 12, JoiningDate = "2023-01-01", DateOfBirth = "1996-04-04", PhoneNumber = "9000000001", DepartmentId = dept.Id };
         context.Employees.Add(employee);
         await context.SaveChangesAsync();
 
@@ -149,12 +165,13 @@ public class EmployeesControllerTests
         var updateDto = new UpdateEmployeeDto
         {
             Name = "Eve Updated",
-            EmployeId = 501,
-            EmployeSalary = 55000,
+            EmployeeId = 501,
+            EmployeeSalary = 55000,
             LeavesCount = 15,
-            JoingDate = "2023-01-01",
+            JoiningDate = "2023-01-01",
             DateOfBirth = "1996-04-04",
-            PhoneNumber = "9000000001"
+            PhoneNumber = "9000000001",
+            DepartmentId = dept.Id
         };
 
         // Act
@@ -164,7 +181,7 @@ public class EmployeesControllerTests
         var okResult = Assert.IsType<OkObjectResult>(result);
         var updatedEmp = Assert.IsType<Employee>(okResult.Value);
         Assert.Equal("Eve Updated", updatedEmp.Name);
-        Assert.Equal(55000, updatedEmp.EmployeSalary);
+        Assert.Equal(55000, updatedEmp.EmployeeSalary);
     }
 
     [Fact]
@@ -172,7 +189,8 @@ public class EmployeesControllerTests
     {
         // Arrange
         using var context = GetInMemoryDbContext();
-        var employee = new Employee { Name = "Frank", EmployeId = 601, EmployeSalary = 40000, LeavesCount = 10, JoingDate = "2024-03-01", DateOfBirth = "1997-07-07", PhoneNumber = "9111111111" };
+        var dept = SeedDepartment(context);
+        var employee = new Employee { Name = "Frank", EmployeeId = 601, EmployeeSalary = 40000, LeavesCount = 10, JoiningDate = "2024-03-01", DateOfBirth = "1997-07-07", PhoneNumber = "9111111111", DepartmentId = dept.Id };
         context.Employees.Add(employee);
         await context.SaveChangesAsync();
 

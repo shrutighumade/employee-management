@@ -9,6 +9,7 @@ public class CreateEmployeeDto
     public string JoiningDate { get; set; } = string.Empty;
     public string DateOfBirth { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
+    public int DepartmentId { get; set; }
 }
 
 public class UpdateEmployeeDto
@@ -20,6 +21,7 @@ public class UpdateEmployeeDto
     public string JoiningDate { get; set; } = string.Empty;
     public string DateOfBirth { get; set; } = string.Empty;
     public string PhoneNumber { get; set; } = string.Empty;
+    public int DepartmentId { get; set; }
 }
 
 public class PaginatedResponse<T>
