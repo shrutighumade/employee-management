@@ -1,22 +1,20 @@
 using EmployeeManagement.API.Data;
 using EmployeeManagement.API.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using System.Text;
 using Microsoft.OpenApi.Models;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Database (PostgreSQL only)
+builder.Services.AddDbContext<AppDbContext>(options =>
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+// Authentication & JWT
 var jwtSettings = builder.Configuration.GetSection("Jwt");
-
-var jwtKey = jwtSettings["Key"];
-
-if (string.IsNullOrEmpty(jwtKey))
-{
-    throw new InvalidOperationException(
-        "JWT Key is not configured."
-    );
-}
+var jwtKey = jwtSettings["Key"] ?? throw new InvalidOperationException("JWT Key is not configured.");
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -27,40 +25,24 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-
             ValidIssuer = jwtSettings["Issuer"],
             ValidAudience = jwtSettings["Audience"],
-
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(jwtKey)
-            )
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
         };
     });
 
-// Add Controllers
+// Services & Controllers
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddControllers();
 
-// Configure CORS for Angular Frontend
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
-    {
-        policy.AllowAnyOrigin()
-              .AllowAnyHeader()
-              .AllowAnyMethod();
-    });
+        policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-
-builder.Services.AddDbContext<AppDbContext>(options =>
-{
-    // Configure Database with resilience: try PostgreSQL, fallback to SQLite if PostgreSQL is offline
-    options.UseSqlite("Data Source=EmployeeManagement.db");
-});
-
-builder.Services.AddScoped<IAuthService, AuthService>();
-
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
@@ -71,19 +53,14 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "Bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Enter your JWT token. Example: Bearer {token}"
+        Description = "Enter your JWT token."
     });
-
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
             },
             Array.Empty<string>()
         }
@@ -92,7 +69,7 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
-// Auto-ensure database and tables exist on startup
+// Ensure PostgreSQL database & tables are created
 using (var scope = app.Services.CreateScope())
 {
     var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
@@ -102,7 +79,7 @@ using (var scope = app.Services.CreateScope())
     }
     catch (Exception ex)
     {
-        Console.WriteLine($"Database initialization note: {ex.Message}");
+        Console.WriteLine($"Database initialization error: {ex.Message}");
     }
 }
 

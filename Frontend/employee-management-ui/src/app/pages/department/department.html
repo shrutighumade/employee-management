@@ -1,0 +1,308 @@
+<div class="department-page">
+  <!-- Page Header -->
+  <header class="page-header">
+    <div>
+      <h1 class="header-title">Department Management</h1>
+      <p class="header-subtitle">Manage departments, assign locations, and track team headcount.</p>
+    </div>
+    <div>
+      <button type="button" class="btn-primary-custom" (click)="openAddDrawer()">
+        <i class="fa-solid fa-building-circle-arrow-right"></i>
+        <span>Add Department</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Metric KPI Cards -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-icon indigo">
+        <i class="fa-solid fa-building"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-label">Total Departments</span>
+        <span class="metric-value">{{ totalCount() }}</span>
+      </div>
+    </div>
+
+    <div class="metric-card">
+      <div class="metric-icon emerald">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <div class="metric-info">
+        <span class="metric-label">Employees on Page</span>
+        <span class="metric-value">{{ totalEmployees() }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Error Banner -->
+  @if (errorMessage()) {
+  <div class="error-banner" role="alert">
+    <i class="fa-solid fa-circle-exclamation"></i>
+    {{ errorMessage() }}
+  </div>
+  }
+
+  <!-- Search & Toolbar -->
+  <div class="toolbar-card">
+    <div class="search-box">
+      <i class="fa-solid fa-magnifying-glass search-icon"></i>
+      <input type="text" class="search-input" placeholder="Search by name, location, or description..."
+        [value]="searchQuery()" (input)="updateSearchQuery($event)" aria-label="Search departments" />
+      @if (searchQuery()) {
+      <button type="button" class="clear-search-btn" (click)="clearSearch()" aria-label="Clear search">
+        <i class="fa-solid fa-circle-xmark"></i>
+      </button>
+      }
+    </div>
+
+    <div class="d-flex align-items-center gap-2">
+      <span class="badge bg-light text-secondary border px-3 py-2 fw-semibold">
+        Max 5 per page &bull; Total {{ totalCount() }} records
+      </span>
+    </div>
+  </div>
+
+  <!-- Data Table -->
+  <div class="table-card">
+    <div class="table-responsive">
+      <table class="custom-table" aria-label="Departments list table">
+        <thead>
+          <tr>
+            <th scope="col" style="width: 60px;">#</th>
+            <th scope="col">Department</th>
+            <th scope="col">Description</th>
+            <th scope="col">Location</th>
+            <th scope="col">Employees</th>
+            <th scope="col">Created</th>
+            <th scope="col" class="text-end" style="width: 140px;">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (isLoading()) {
+          <tr>
+            <td colspan="7">
+              <div class="loading-state">
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                <span>Loading departments...</span>
+              </div>
+            </td>
+          </tr>
+          }
+
+          @for (dept of departments(); track dept.id; let i = $index) {
+          <tr>
+            <td class="text-secondary fw-semibold">{{ (currentPage() - 1) * pageSize() + i + 1 }}</td>
+            <td>
+              <div class="dept-cell">
+                <div class="avatar-pill" [style.background]="getAvatarColor(dept.name)">
+                  {{ getInitials(dept.name) }}
+                </div>
+                <div class="dept-name">{{ dept.name }}</div>
+              </div>
+            </td>
+            <td>
+              <span class="text-secondary" style="font-size: 0.88rem;">
+                {{ dept.description || '—' }}
+              </span>
+            </td>
+            <td>
+              <span class="badge-location">
+                <i class="fa-solid fa-location-dot"></i>
+                {{ dept.location || '—' }}
+              </span>
+            </td>
+            <td>
+              <span class="badge-count">
+                <i class="fa-solid fa-users"></i>
+                {{ dept.employeeCount }}
+              </span>
+            </td>
+            <td>
+              <span class="text-secondary" style="font-size: 0.88rem;">
+                {{ dept.createdAt | slice:0:10 }}
+              </span>
+            </td>
+            <td class="text-end">
+              <div class="action-group">
+                <button type="button" class="btn-action-edit" (click)="editDepartment(i)" aria-label="Edit department">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                  <span>Edit</span>
+                </button>
+                <button type="button" class="btn-action-delete" (click)="promptDelete(i)"
+                  aria-label="Delete department">
+                  <i class="fa-solid fa-trash-can"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          }
+
+          @if (departments().length === 0 && !isLoading()) {
+          <tr>
+            <td colspan="7">
+              <div class="empty-state">
+                <div class="empty-icon">
+                  <i class="fa-solid fa-building"></i>
+                </div>
+                <h3 class="empty-title">No departments found</h3>
+                <p class="empty-desc">
+                  @if (searchQuery()) {
+                  No results matched "{{ searchQuery() }}". Try a different search term.
+                  } @else {
+                  No departments yet. Click "Add Department" to create one.
+                  }
+                </p>
+                @if (searchQuery()) {
+                <button type="button" class="btn btn-outline-secondary btn-sm rounded-pill px-4"
+                  (click)="clearSearch()">
+                  Clear Search
+                </button>
+                } @else {
+                <button type="button" class="btn-primary-custom" (click)="openAddDrawer()">
+                  <i class="fa-solid fa-building-circle-arrow-right"></i> Add Department
+                </button>
+                }
+              </div>
+            </td>
+          </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Pagination -->
+    @if (totalCount() > 0) {
+    <div class="pagination-card">
+      <div class="pagination-info">
+        Showing Page <strong>{{ currentPage() }}</strong> of <strong>{{ totalPages() }}</strong>
+        ({{ totalCount() }} total departments)
+      </div>
+
+      <div class="pagination-controls">
+        <button type="button" class="page-btn" [disabled]="currentPage() <= 1" (click)="prevPage()"
+          aria-label="Previous Page">
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+
+        @for (p of pagesArray; track p) {
+        <button type="button" class="page-btn" [class.active]="currentPage() === p" (click)="goToPage(p)">
+          {{ p }}
+        </button>
+        }
+
+        <button type="button" class="page-btn" [disabled]="currentPage() >= totalPages()" (click)="nextPage()"
+          aria-label="Next Page">
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
+    }
+  </div>
+
+  <!-- Drawer -->
+  <div class="drawer-backdrop" [class.show]="isDrawerOpen()" (click)="closeDrawer()" role="presentation">
+    <div class="drawer-panel" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+      [attr.aria-label]="editingIndex() === null ? 'Add Department Form' : 'Edit Department Form'">
+      <div class="drawer-header">
+        <h2 class="drawer-title">
+          <i class="fa-solid fa-building text-primary me-2"></i>
+          @if (editingIndex() === null) { Add New Department } @else { Edit Department }
+        </h2>
+        <button type="button" class="btn-close-drawer" (click)="closeDrawer()" aria-label="Close panel">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="drawer-body">
+        @if (serverError()) {
+        <div class="server-error-banner" role="alert">
+          <i class="fa-solid fa-circle-exclamation"></i>
+          {{ serverError() }}
+        </div>
+        }
+
+        <form [formGroup]="departmentForm" id="departmentForm" (ngSubmit)="saveDepartment()">
+          <div class="form-section-title">
+            <i class="fa-solid fa-building"></i> Department Details
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom" for="deptName">Department Name</label>
+            <div class="input-icon-wrapper">
+              <i class="fa-solid fa-building input-icon"></i>
+              <input id="deptName" type="text" class="form-control-custom"
+                [class.is-invalid]="departmentForm.controls.name.touched && departmentForm.controls.name.invalid"
+                formControlName="name" placeholder="e.g. Engineering" />
+            </div>
+            @if (departmentForm.controls.name.touched && departmentForm.controls.name.errors?.['required']) {
+            <div class="error-feedback">
+              <i class="fa-solid fa-circle-exclamation"></i> Name is required.
+            </div>
+            }
+            @if (departmentForm.controls.name.touched && departmentForm.controls.name.errors?.['minlength']) {
+            <div class="error-feedback">
+              <i class="fa-solid fa-circle-exclamation"></i> Name must be at least 2 characters.
+            </div>
+            }
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom" for="deptDesc">Description</label>
+            <div class="input-icon-wrapper">
+              <i class="fa-solid fa-align-left input-icon" style="top: 1rem;"></i>
+              <textarea id="deptDesc" class="form-control-custom"
+                [class.is-invalid]="departmentForm.controls.description.touched && departmentForm.controls.description.invalid"
+                formControlName="description" placeholder="Brief description of this department" rows="3"
+                style="padding-top: 0.6rem;"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label-custom" for="deptLocation">Location</label>
+            <div class="input-icon-wrapper">
+              <i class="fa-solid fa-location-dot input-icon"></i>
+              <input id="deptLocation" type="text" class="form-control-custom"
+                [class.is-invalid]="departmentForm.controls.location.touched && departmentForm.controls.location.invalid"
+                formControlName="location" placeholder="e.g. Pune, Maharashtra" />
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div class="drawer-footer">
+        <button type="button" class="btn btn-outline-secondary w-50 py-2 fw-semibold" (click)="closeDrawer()">
+          Cancel
+        </button>
+        <button type="submit" form="departmentForm" class="btn-primary-custom w-50 justify-content-center py-2">
+          @if (editingIndex() === null) { Add Department } @else { Save Changes }
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  @if (deleteConfirmIndex() !== null) {
+  <div class="modal-backdrop-custom" (click)="cancelDelete()">
+    <div class="modal-dialog-custom" (click)="$event.stopPropagation()" role="dialog" aria-modal="true"
+      aria-label="Confirm Deletion">
+      <div class="delete-modal-icon">
+        <i class="fa-solid fa-trash-can"></i>
+      </div>
+      <h4 class="fw-bold text-dark mb-2">Delete Department?</h4>
+      <p class="text-secondary small mb-4">
+        Departments with assigned employees cannot be deleted. Make sure no employees are assigned before deleting.
+      </p>
+      <div class="d-flex gap-2">
+        <button type="button" class="btn btn-light border w-50 py-2 fw-semibold" (click)="cancelDelete()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger w-50 py-2 fw-semibold" (click)="confirmDelete()">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+</div>

@@ -53,6 +53,17 @@
         </li>
         <li>
           <a
+            routerLink="/department"
+            routerLinkActive="active"
+            class="nav-link-item"
+            (click)="isMobileMenuOpen.set(false)"
+          >
+            <i class="fa-solid fa-building nav-icon"></i>
+            <span>Departments</span>
+          </a>
+        </li>
+        <li>
+          <a
             routerLink="/users"
             routerLinkActive="active"
             class="nav-link-item"
