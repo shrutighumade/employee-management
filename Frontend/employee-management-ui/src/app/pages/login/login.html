@@ -1,70 +1,108 @@
 <div class="auth-page">
   <div class="login-container">
-    <!-- Login Card -->
+
     <div class="card auth-card">
       <div class="card-body">
+
         <!-- Header -->
         <div class="login-header">
-          <h2 class="auth-title">Welcome Back</h2>
+          <div class="login-icon">
+            <i class="fa-solid fa-user-lock"></i>
+          </div>
 
-          <p class="auth-subtitle">Sign in to your account</p>
+          <h2 class="auth-title">Welcome Back</h2>
+          <p class="auth-subtitle">
+            Sign in to continue to your account
+          </p>
         </div>
 
         <!-- Login Form -->
         <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+
           <!-- Email -->
           <div class="form-field">
-            <label for="email" class="form-label custom-label"> Email Address </label>
+            <div class="input-wrapper">
+              <i class="fa-regular fa-envelope input-icon"></i>
 
-            <input
-              id="email"
-              type="email"
-              class="form-control custom-input"
-              formControlName="email"
-              placeholder="Enter your email"
-            />
+              <input id="email"
+                     type="email"
+                     class="form-control custom-input"
+                     formControlName="email"
+                     placeholder="Enter your email address"
+                     aria-label="Email address"
+                     autocomplete="email" />
+            </div>
 
             @if (loginForm.controls.email.touched && loginForm.controls.email.invalid) {
-              <div class="invalid-message">Please enter a valid email address.</div>
+            <div class="invalid-message">
+              @if (loginForm.controls.email.hasError('required')) {
+              Email address is required.
+              } @else {
+              Please enter a valid email address.
+              }
+            </div>
             }
           </div>
 
           <!-- Password -->
           <div class="form-field">
-            <label for="password" class="form-label custom-label"> Password </label>
+            <div class="input-wrapper">
+              <i class="fa-solid fa-lock input-icon"></i>
 
-            <input
-              id="password"
-              type="password"
-              class="form-control custom-input"
-              formControlName="password"
-              placeholder="Enter your password"
-            />
+              <input id="password"
+                     type="password"
+                     class="form-control custom-input"
+                     formControlName="password"
+                     placeholder="Enter your password"
+                     aria-label="Password"
+                     autocomplete="current-password" />
+            </div>
 
             @if (loginForm.controls.password.touched && loginForm.controls.password.invalid) {
-              <div class="invalid-message">Password is required.</div>
+            <div class="invalid-message">
+              Password is required.
+            </div>
             }
           </div>
 
           <!-- Forgot Password -->
           <div class="forgot-container">
-            <a routerLink="/forgot-password" class="forgot-link"> Forgot Password? </a>
+            <a routerLink="/forgot-password" class="forgot-link">
+              Forgot password?
+            </a>
           </div>
 
           <!-- Login Button -->
-          <button type="submit" class="btn btn-login">Sign In</button>
+          <button type="submit"
+                  class="btn btn-login"
+                  [disabled]="loginForm.invalid || isSubmitting">
+            @if (isSubmitting) {
+            <span class="spinner-border spinner-border-sm me-2"></span>
+            Signing In...
+            } @else {
+            Sign In
+            <i class="fa-solid fa-arrow-right ms-2"></i>
+            }
+          </button>
+
         </form>
 
         <!-- Register -->
         <div class="register-section">
-          <span> Don't have an account? </span>
+          <span>Don't have an account?</span>
 
-          <a routerLink="/register" class="register-link"> Create Account </a>
+          <a routerLink="/register" class="register-link">
+            Create Account
+          </a>
         </div>
+
       </div>
     </div>
 
     <!-- Footer -->
-    <div class="copyright">© 2026 Employee Management System</div>
+    <div class="copyright">
+      © 2026 Employee Management System
+    </div>
+
   </div>
 </div>

@@ -1,1 +1,260 @@
-<p>profile works!</p>
+<div class="profile-page">
+
+  <!-- Header -->
+  <header class="header">
+
+    <div class="brand">
+      <i class="fa-solid fa-users"></i>
+      <span>Employee Management</span>
+    </div>
+
+    <div class="header-actions">
+
+      <a routerLink="/dashboard" class="back-link">
+        <i class="fa-solid fa-arrow-left"></i>
+        Dashboard
+      </a>
+
+      <button class="logout-btn" (click)="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <!-- Main Content -->
+  <main class="profile-content">
+
+    <div class="page-heading">
+
+      <div>
+        <h1>My Profile</h1>
+        <p>View and manage your personal information.</p>
+      </div>
+
+      <span class="breadcrumb">
+        Dashboard / My Profile
+      </span>
+
+    </div>
+
+
+    @if (isLoading) {
+
+    <div class="loading">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      Loading profile...
+    </div>
+
+    } @else {
+
+    <div class="profile-layout">
+
+      <!-- Profile Sidebar -->
+      <aside class="profile-sidebar">
+
+        <div class="avatar">
+          {{ userInitials }}
+        </div>
+
+        <h2>
+          {{ profileForm.controls.firstName.value }}
+          {{ profileForm.controls.lastName.value }}
+        </h2>
+
+        <p class="user-email">
+          {{ profileForm.controls.email.value }}
+        </p>
+
+        <span class="status-badge">
+          <i class="fa-solid fa-circle"></i>
+          Active Account
+        </span>
+
+        <div class="sidebar-divider"></div>
+
+        <a routerLink="/dashboard" class="sidebar-link">
+          <i class="fa-solid fa-house"></i>
+          Dashboard
+        </a>
+
+        <a routerLink="/change-password" class="sidebar-link">
+          <i class="fa-solid fa-lock"></i>
+          Change Password
+        </a>
+
+      </aside>
+
+
+      <!-- Profile Details -->
+      <section class="profile-details">
+
+        <div class="section-header">
+
+          <div>
+            <h2>Personal Information</h2>
+            <p>Update your personal details below.</p>
+          </div>
+
+          @if (!isEditing) {
+
+          <button type="button"
+                  class="edit-btn"
+                  (click)="enableEdit()">
+
+            <i class="fa-solid fa-pen"></i>
+            Edit Profile
+
+          </button>
+
+          }
+
+        </div>
+
+
+        <form [formGroup]="profileForm" (ngSubmit)="saveProfile()">
+
+          <div class="form-grid">
+
+            <!-- First Name -->
+            <div class="form-group">
+
+              <label for="firstName">First Name</label>
+
+              <div class="input-wrapper">
+                <i class="fa-regular fa-user"></i>
+
+                <input id="firstName"
+                       type="text"
+                       formControlName="firstName"
+                       placeholder="Enter first name"
+                       [readOnly]="!isEditing">
+              </div>
+
+              @if (
+              profileForm.controls.firstName.touched &&
+              profileForm.controls.firstName.invalid
+              ) {
+              <small class="error">
+                First name is required.
+              </small>
+              }
+
+            </div>
+
+
+            <!-- Last Name -->
+            <div class="form-group">
+
+              <label for="lastName">Last Name</label>
+
+              <div class="input-wrapper">
+                <i class="fa-regular fa-user"></i>
+
+                <input id="lastName"
+                       type="text"
+                       formControlName="lastName"
+                       placeholder="Enter last name"
+                       [readOnly]="!isEditing">
+              </div>
+
+              @if (
+              profileForm.controls.lastName.touched &&
+              profileForm.controls.lastName.invalid
+              ) {
+              <small class="error">
+                Last name is required.
+              </small>
+              }
+
+            </div>
+
+
+            <!-- Email -->
+            <div class="form-group full-width">
+
+              <label for="email">Email Address</label>
+
+              <div class="input-wrapper">
+                <i class="fa-regular fa-envelope"></i>
+
+                <input id="email"
+                       type="email"
+                       formControlName="email"
+                       placeholder="Enter email address"
+                       [readOnly]="!isEditing">
+              </div>
+
+              @if (
+              profileForm.controls.email.touched &&
+              profileForm.controls.email.invalid
+              ) {
+              <small class="error">
+                Please enter a valid email address.
+              </small>
+              }
+
+            </div>
+
+          </div>
+
+
+          @if (isEditing) {
+
+          <div class="form-actions">
+
+            <button type="button"
+                    class="cancel-btn"
+                    (click)="cancelEdit()">
+
+              Cancel
+
+            </button>
+
+            <button type="submit"
+                    class="save-btn"
+                    [disabled]="profileForm.invalid">
+
+              <i class="fa-solid fa-check"></i>
+              Save Changes
+
+            </button>
+
+          </div>
+
+          }
+
+        </form>
+
+
+        <!-- Account Security -->
+        <div class="security-section">
+
+          <div class="security-icon">
+            <i class="fa-solid fa-shield-halved"></i>
+          </div>
+
+          <div class="security-info">
+            <h3>Account Security</h3>
+            <p>Keep your account protected with a strong password.</p>
+          </div>
+
+          <a routerLink="/change-password" class="security-link">
+            Update
+            <i class="fa-solid fa-arrow-right"></i>
+          </a>
+
+        </div>
+
+      </section>
+
+    </div>
+
+    }
+
+  </main>
+
+</div>

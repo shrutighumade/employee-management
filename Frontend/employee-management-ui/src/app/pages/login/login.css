@@ -4,15 +4,13 @@
 
 .auth-page {
   width: 100%;
-  height: 100vh;
   min-height: 100vh;
-  background: #f8fafc;
+  background: #f1f5f9;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 20px;
   box-sizing: border-box;
-  overflow: hidden;
 }
 
 /* =================================
@@ -21,7 +19,7 @@
 
 .login-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 410px;
   margin: 0 auto;
 }
 
@@ -33,17 +31,14 @@
   width: 100%;
   background: #ffffff;
   border: 1px solid #e2e8f0;
-  border-radius: 14px;
-  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07);
+  border-radius: 16px;
+  box-shadow: 0 12px 35px rgba(15, 23, 42, 0.07);
+  overflow: hidden;
 }
 
-/* =================================
-   Card Body
-================================= */
-
-.auth-card .card-body {
-  padding: 32px;
-}
+  .auth-card .card-body {
+    padding: 36px;
+  }
 
 /* =================================
    Header
@@ -51,20 +46,35 @@
 
 .login-header {
   text-align: center;
-  margin-bottom: 28px;
+  margin-bottom: 32px;
+}
+
+.login-icon {
+  width: 54px;
+  height: 54px;
+  margin: 0 auto 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eef2ff;
+  color: #4f46e5;
+  border-radius: 14px;
+  font-size: 21px;
 }
 
 .auth-title {
-  margin: 0 0 6px;
+  margin: 0 0 8px;
   color: #0f172a;
-  font-size: 24px;
+  font-size: 25px;
   font-weight: 700;
+  letter-spacing: -0.5px;
 }
 
 .auth-subtitle {
   margin: 0;
   color: #64748b;
   font-size: 13px;
+  line-height: 1.6;
 }
 
 /* =================================
@@ -72,35 +82,67 @@
 ================================= */
 
 .form-field {
-  margin-bottom: 18px;
+  margin-bottom: 20px;
 }
 
-.custom-label {
-  display: block;
-  margin-bottom: 6px;
-  color: #334155;
-  font-size: 13px;
-  font-weight: 600;
+.input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.input-icon {
+  position: absolute;
+  left: 15px;
+  color: #94a3b8;
+  font-size: 14px;
+  pointer-events: none;
+  transition: color 0.2s ease;
 }
 
 .custom-input {
   width: 100%;
-  height: 44px;
-  padding: 0 12px;
+  height: 48px;
+  padding: 0 14px 0 43px;
   border: 1px solid #cbd5e1;
-  border-radius: 8px;
+  border-radius: 9px;
+  background: #ffffff;
   color: #0f172a;
   font-size: 13px;
   box-shadow: none;
+  transition: all 0.2s ease;
 }
 
-.custom-input::placeholder {
-  color: #94a3b8;
+  .custom-input::placeholder {
+    color: #94a3b8;
+    opacity: 1;
+  }
+
+  .custom-input:hover {
+    border-color: #a5b4fc;
+  }
+
+  .custom-input:focus {
+    border-color: #6366f1;
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.10);
+    outline: none;
+  }
+
+.input-wrapper:focus-within .input-icon {
+  color: #4f46e5;
 }
 
-.custom-input:focus {
-  border-color: #6366f1;
-  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+/* =================================
+   Validation
+================================= */
+
+.invalid-message {
+  margin-top: 7px;
+  padding-left: 3px;
+  color: #dc2626;
+  font-size: 11px;
+  font-weight: 500;
 }
 
 /* =================================
@@ -108,9 +150,10 @@
 ================================= */
 
 .forgot-container {
-  text-align: right;
-  margin-top: -4px;
-  margin-bottom: 20px;
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -3px;
+  margin-bottom: 24px;
 }
 
 .forgot-link {
@@ -118,12 +161,13 @@
   font-size: 12px;
   font-weight: 600;
   text-decoration: none;
+  transition: color 0.2s ease;
 }
 
-.forgot-link:hover {
-  color: #3730a3;
-  text-decoration: underline;
-}
+  .forgot-link:hover {
+    color: #3730a3;
+    text-decoration: underline;
+  }
 
 /* =================================
    Login Button
@@ -131,28 +175,47 @@
 
 .btn-login {
   width: 100%;
-  height: 44px;
+  height: 47px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   border: none;
-  border-radius: 8px;
+  border-radius: 9px;
   background: #4f46e5;
   color: #ffffff;
   font-size: 13px;
-  font-weight: 700;
-  transition: all 0.2s ease;
+  font-weight: 600;
+  transition: background 0.2s ease, transform 0.2s ease;
 }
 
-.btn-login:hover {
-  background: #4338ca;
-  transform: translateY(-1px);
-}
+  .btn-login:not(:disabled):hover {
+    background: #4338ca;
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(79, 70, 229, 0.18);
+  }
+
+  .btn-login:not(:disabled):active {
+    transform: translateY(0);
+  }
+
+  /* Disabled State */
+
+  .btn-login:disabled {
+    background: #cbd5e1;
+    color: #64748b;
+    cursor: not-allowed;
+    opacity: 1;
+    box-shadow: none;
+    transform: none;
+  }
 
 /* =================================
    Register
 ================================= */
 
 .register-section {
-  margin-top: 24px;
-  padding-top: 20px;
+  margin-top: 27px;
+  padding-top: 22px;
   border-top: 1px solid #e2e8f0;
   text-align: center;
   color: #64748b;
@@ -166,46 +229,40 @@
   text-decoration: none;
 }
 
-.register-link:hover {
-  color: #3730a3;
-  text-decoration: underline;
-}
-
-/* =================================
-   Validation
-================================= */
-
-.invalid-message {
-  margin-top: 5px;
-  color: #ef4444;
-  font-size: 11px;
-}
+  .register-link:hover {
+    color: #3730a3;
+    text-decoration: underline;
+  }
 
 /* =================================
    Footer
 ================================= */
 
 .copyright {
-  margin-top: 14px;
+  margin-top: 18px;
   text-align: center;
   color: #94a3b8;
   font-size: 11px;
 }
 
 /* =================================
-   Mobile
+   Mobile Responsive
 ================================= */
 
 @media (max-width: 500px) {
   .auth-page {
-    padding: 15px;
+    padding: 16px;
   }
 
   .auth-card .card-body {
-    padding: 25px;
+    padding: 27px 23px;
   }
 
   .auth-title {
-    font-size: 21px;
+    font-size: 23px;
+  }
+
+  .login-header {
+    margin-bottom: 27px;
   }
 }

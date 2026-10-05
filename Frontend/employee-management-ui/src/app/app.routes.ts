@@ -4,6 +4,7 @@ import { Employee } from './pages/employee/employee';
 import { ForgotPassword } from './pages/forgot-password/forgot-password';
 import { Login } from './pages/login/login';
 import { PageNotFound } from './pages/page-not-found/page-not-found';
+import { Profile } from './pages/profile/profile';
 import { Register } from './pages/register/register';
 import { ResetPassword } from './pages/reset-password/reset-password';
 
@@ -44,8 +45,13 @@ export const routes: Routes = [
     data: { renderMode: 'client' },
   },
   {
+    path: 'profile',
+    component: Profile
+  },
+  {
     path: '**',
     component: PageNotFound,
-    data: { renderMode: 'client' },
+    data: { renderMode: 'client' }
   },
+  
 ];

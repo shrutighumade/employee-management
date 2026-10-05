@@ -18,8 +18,11 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/login`, data);
   }
 
-  public forgotPassword(data: any): Observable<any> {
-    return this.http.post(`${this.apiUrl}/forgot-password`, data);
+  public forgotPassword(email: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(
+      `${this.apiUrl}/forgot-password`,
+      { email }
+    );
   }
 
   public resetPassword(data: any): Observable<any> {

@@ -1,45 +1,104 @@
 <div class="dashboard">
-  <!-- Header -->
-
-  <header class="header">
-    <div class="logo">Employee Management</div>
-
-    <button class="logout-btn" (click)="logout()">Logout</button>
-  </header>
-
+  
   <!-- Main Content -->
-
   <main class="dashboard-content">
-    <h1>Welcome, {{ userName }} 👋</h1>
+    
 
-    <p class="subtitle">Welcome to your dashboard.</p>
+    <!-- Welcome Banner -->
+    <section class="welcome-banner">
 
-    <!-- Cards -->
+      <div class="welcome-text">
 
-    <div class="cards">
-      <div class="card">
+        <h1>
+          Welcome, <span>{{ userName }}</span> 👋
+        </h1>
+
+        <h2>Welcome to your dashboard.</h2>
+
+        <p>
+          Manage your profile, update your password and keep your
+          account secure — all in one place.
+        </p>
+
+      </div>
+
+      <div class="welcome-illustration">
+        <i class="fa-solid fa-laptop-code"></i>
+        <i class="fa-solid fa-circle-check check-icon"></i>
+      </div>
+
+    </section>
+
+
+    <!-- Dashboard Cards -->
+    <section class="cards">
+
+      <!-- Profile Card -->
+      <article class="card profile-card">
+
+        <div class="card-icon">
+          <i class="fa-regular fa-user"></i>
+        </div>
+
         <h3>My Profile</h3>
 
-        <p>View and update your profile information.</p>
+        <p>
+          View and update your personal information,
+          contact details and profile.
+        </p>
 
-        <a routerLink="/profile"> View Profile </a>
-      </div>
+        <a routerLink="/profile" class="card-btn">
+          View Profile
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
 
-      <div class="card">
+      </article>
+
+
+      <!-- Password Card -->
+      <article class="card password-card">
+
+        <div class="card-icon">
+          <i class="fa-solid fa-lock"></i>
+        </div>
+
         <h3>Change Password</h3>
 
-        <p>Update your account password.</p>
+        <p>
+          Keep your account secure by updating
+          your password regularly.
+        </p>
 
-        <a routerLink="/change-password"> Change Password </a>
-      </div>
+        <a routerLink="/change-password" class="card-btn">
+          Change Password
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
 
-      <div class="card">
+      </article>
+
+
+      <!-- Account Card -->
+      <article class="card account-card">
+
+        <div class="card-icon">
+          <i class="fa-solid fa-gear"></i>
+        </div>
+
         <h3>Account</h3>
 
-        <p>Manage your account settings.</p>
+        <p>
+          Manage your account settings and
+          personal preferences.
+        </p>
 
-        <a routerLink="/profile"> Account Details </a>
-      </div>
-    </div>
+        <a routerLink="/profile" class="card-btn">
+          Account Details
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+
+      </article>
+
+    </section>
+
   </main>
 </div>

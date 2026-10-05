@@ -7,19 +7,22 @@ using EmployeeManagement.API.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
+
 namespace EmployeeManagement.API.Services;
 
 public class AuthService : IAuthService
 {
     private readonly AppDbContext _context;
     private readonly IConfiguration _configuration;
-
+    private readonly IEmailService _emailService;
     public AuthService(
-        AppDbContext context,
-        IConfiguration configuration)
+     AppDbContext context,
+     IConfiguration configuration,
+     IEmailService emailService)
     {
         _context = context;
         _configuration = configuration;
+        _emailService = emailService;
     }
 
     public async Task<string> RegisterAsync(RegisterRequest request)
@@ -135,7 +138,7 @@ public class AuthService : IAuthService
     }
 
     public async Task<string> ForgotPasswordAsync(
-        ForgotPasswordRequest request)
+     ForgotPasswordRequest request)
     {
         var user = await _context.Users
             .FirstOrDefaultAsync(x => x.Email == request.Email);
@@ -145,6 +148,71 @@ public class AuthService : IAuthService
             return "If the email is registered, a password reset link will be sent.";
         }
 
-        return "Password reset link sent successfully.";
+        // Generate a secure random token
+        var tokenBytes = System.Security.Cryptography.RandomNumberGenerator.GetBytes(32);
+
+        var token = Convert.ToBase64String(tokenBytes)
+            .Replace("+", "-")
+            .Replace("/", "_")
+            .Replace("=", "");
+
+        // Save reset token
+        var resetToken = new PasswordResetToken
+        {
+            UserId = user.Id,
+            Token = token,
+            ExpiresAt = DateTime.UtcNow.AddMinutes(30),
+            IsUsed = false
+        };
+
+        _context.PasswordResetTokens.Add(resetToken);
+
+        await _context.SaveChangesAsync();
+
+        // Create frontend reset link
+        var resetLink =
+            $"http://localhost:4200/reset-password?email={Uri.EscapeDataString(user.Email)}&token={Uri.EscapeDataString(token)}";
+
+        // Prepare email
+        var subject = "Employee Management - Password Reset";
+
+        var body = $@"
+        <html>
+        <body style='font-family: Arial, sans-serif;'>
+            <h2>Password Reset Request</h2>
+
+            <p>Hello {System.Net.WebUtility.HtmlEncode(user.FirstName)},</p>
+
+            <p>We received a request to reset your password.</p>
+
+            <p>Click the button below to reset your password:</p>
+
+            <a href='{resetLink}'
+               style='background-color:#2563eb;
+                      color:white;
+                      padding:12px 20px;
+                      text-decoration:none;
+                      border-radius:5px;
+                      display:inline-block;'>
+                Reset Password
+            </a>
+
+            <p>This link expires in 30 minutes.</p>
+
+            <p>If you did not request a password reset, please ignore this email.</p>
+
+            <br>
+            <p>Regards,<br>Employee Management Team</p>
+        </body>
+        </html>";
+
+        // Actually send email
+        await _emailService.SendEmailAsync(
+            user.Email,
+            subject,
+            body
+        );
+
+        return "Password reset email sent successfully. Please check your inbox.";
     }
 }
