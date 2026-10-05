@@ -22,7 +22,7 @@ public class EmployeesController : ControllerBase
     public async Task<ActionResult<PaginatedResponse<Employee>>> GetEmployees(
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 5,
-        [FromQuery] string? search = null)
+        [FromQuery] string search = "")
     {
         if (page < 1) page = 1;
         if (pageSize < 1) pageSize = 5;
@@ -31,7 +31,7 @@ public class EmployeesController : ControllerBase
         {
             await _context.Database.EnsureCreatedAsync();
 
-            IQueryable<Employee> query = _context.Employees;
+            IQueryable<Employee> query = _context.Employees.Include(e => e.Department);
 
             if (!string.IsNullOrWhiteSpace(search))
             {
@@ -72,11 +72,15 @@ public class EmployeesController : ControllerBase
     {
         try
         {
-            var employee = await _context.Employees.FindAsync(id);
+            var employee = await _context.Employees
+                .Include(e => e.Department)
+                .FirstOrDefaultAsync(e => e.Id == id);
+
             if (employee == null)
             {
                 return NotFound(new { message = $"Employee with ID {id} not found." });
             }
+
             return Ok(employee);
         }
         catch (Exception ex)
@@ -106,7 +110,8 @@ public class EmployeesController : ControllerBase
                 LeavesCount = dto.LeavesCount,
                 JoiningDate = dto.JoiningDate,
                 DateOfBirth = dto.DateOfBirth,
-                PhoneNumber = dto.PhoneNumber
+                PhoneNumber = dto.PhoneNumber,
+                DepartmentId = dto.DepartmentId
             };
 
             _context.Employees.Add(employee);
@@ -139,6 +144,7 @@ public class EmployeesController : ControllerBase
             employee.JoiningDate = dto.JoiningDate;
             employee.DateOfBirth = dto.DateOfBirth;
             employee.PhoneNumber = dto.PhoneNumber;
+            employee.DepartmentId = dto.DepartmentId;
 
             await _context.SaveChangesAsync();
             return Ok(employee);
