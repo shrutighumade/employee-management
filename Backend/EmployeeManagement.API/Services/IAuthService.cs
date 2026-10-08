@@ -9,4 +9,6 @@ public interface IAuthService
     Task<string> LoginAsync(LoginRequest request);
 
     Task<string> ForgotPasswordAsync(ForgotPasswordRequest request);
+
+    Task<string> ResetPasswordAsync(ResetPasswordRequest request);
 }

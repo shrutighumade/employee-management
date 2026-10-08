@@ -86,4 +86,32 @@ public class AuthController : ControllerBase
             message = result
         });
     }
+
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword(
+    ResetPasswordRequest request)
+    {
+        var result = await _authService.ResetPasswordAsync(request);
+
+        if (result == "Invalid or expired reset token.")
+        {
+            return BadRequest(new
+            {
+                message = result
+            });
+        }
+
+        if (result == "User not found.")
+        {
+            return BadRequest(new
+            {
+                message = result
+            });
+        }
+
+        return Ok(new
+        {
+            message = result
+        });
+    }
 }

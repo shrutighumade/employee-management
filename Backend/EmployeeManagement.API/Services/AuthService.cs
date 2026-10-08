@@ -215,4 +215,37 @@ public class AuthService : IAuthService
 
         return "Password reset email sent successfully. Please check your inbox.";
     }
+
+    public async Task<string> ResetPasswordAsync(
+     ResetPasswordRequest request)
+    {
+        var resetToken = await _context.PasswordResetTokens
+            .FirstOrDefaultAsync(x =>
+                x.Token == request.Token &&
+                !x.IsUsed &&
+                x.ExpiresAt > DateTime.UtcNow);
+
+        if (resetToken == null)
+        {
+            return "Invalid or expired reset token.";
+        }
+
+        var user = await _context.Users
+            .FirstOrDefaultAsync(x => x.Id == resetToken.UserId);
+
+        if (user == null)
+        {
+            return "User not found.";
+        }
+
+        user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(
+            request.NewPassword
+        );
+
+        resetToken.IsUsed = true;
+
+        await _context.SaveChangesAsync();
+
+        return "Password reset successfully.";
+    }
 }
